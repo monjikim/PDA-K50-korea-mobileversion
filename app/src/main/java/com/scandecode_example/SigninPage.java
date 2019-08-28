@@ -22,8 +22,8 @@ public class SigninPage extends Activity {
 
     EditText et_id,et_pw;
     Button bt_login;
-    //String const_ip = "119.201.111.73:7778";
-    String const_ip = "124.194.93.51:7778";
+    String const_ip = "119.201.111.73:7778";
+    //String const_ip = "124.194.93.51:7778";
 
 
     @Override

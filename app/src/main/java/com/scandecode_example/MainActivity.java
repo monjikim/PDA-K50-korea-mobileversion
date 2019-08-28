@@ -61,8 +61,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     int mStatus3 = 0;
     boolean thread_check = false;
     String server_return_string;
-    //String const_ip = "119.201.111.73:7778";
-    String const_ip = "124.194.93.51:7778";
+    String const_ip = "119.201.111.73:7778";
+    //String const_ip = "124.194.93.51:7778";
     EditText container_no,seal_no;
     int thread_count = 0;
 
