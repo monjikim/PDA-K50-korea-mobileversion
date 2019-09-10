@@ -39,6 +39,8 @@ import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import constants.Const;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private EditText mReception;
     private TextView tvcound;
@@ -49,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ScanInterface scanDecode;
     boolean order_no_flag = false;
     boolean serial_no_flag = false;
-    TextView tv_order_no,tv_case_no,tv_date,tv_serial_no,tv_count;
+    TextView tv_order_no,tv_case_no,tv_date,tv_serial_no,tv_count,tv_title;
     ArrayList order_array;
     ArrayList serial_array;
     Button button_undo,button_send;
@@ -96,6 +98,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         container_no = (EditText)findViewById(R.id.container_no);
         seal_no = (EditText)findViewById(R.id.seal_no);
         tv_count = (TextView)findViewById(R.id.tv_count);
+        tv_title = (TextView)findViewById(R.id.tv_title);
 
         order_array = new ArrayList();
         serial_array = new ArrayList();
@@ -108,6 +111,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         today = new Date();
         result = formatter.format(today);
 
+        tv_title.setText("대 한 포 장 ("+Const.Country+")");
         tv_date.setText(result);
 
         container_no.addTextChangedListener(new TextWatcher() {
@@ -776,8 +780,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //buffer += ("case_no") + ("=") + (table_no)+"&";           // 변수 구분은 '&' 사용
                 buffer += ("seal_no") + ("=") + (seal_no.getText())+"&";           // 변수 구분은 '&' 사용
                 buffer += ("container_no") + ("=") + (container_no.getText())+"&";           // 변수 구분은 '&' 사용
-                buffer += ("country") + ("=") + ("VNM")+"&";           // 변수 구분은 '&' 사용
                 buffer += ("order_no") + ("=") + (order_list)+"&";           // 변수 구분은 '&' 사용
+                buffer += ("country") + ("=") + (Const.Country)+"&";           // 변수 구분은 '&' 사용
                 buffer += ("serial_no") + ("=") + serial_list;
                 Log.d("check",buffer);
 

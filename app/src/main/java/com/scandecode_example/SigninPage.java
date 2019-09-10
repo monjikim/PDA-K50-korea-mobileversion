@@ -18,6 +18,8 @@ import java.io.PrintStream;
 import java.net.URL;
 import java.net.URLConnection;
 
+import constants.Const;
+
 public class SigninPage extends Activity {
 
     EditText et_id,et_pw;
@@ -96,8 +98,8 @@ public class SigninPage extends Activity {
                 ps = new PrintStream(con.getOutputStream());
                 String buffer = "";
 
-                buffer += ("id") + ("=") + (id) + "&";            // 변수 구분은 '&' 사용
-                buffer += ("pw") + ("=") + (pw);           // 변수 구분은 '&' 사용
+                buffer += ("id") + ("=") + (id.toLowerCase()) + "&";            // 변수 구분은 '&' 사용
+                buffer += ("pw") + ("=") + (pw.toLowerCase());           // 변수 구분은 '&' 사용
                 Log.d("check", buffer);
 
                 ps.print(buffer);
@@ -115,11 +117,12 @@ public class SigninPage extends Activity {
                 Log.d("check", return_string);
                 String final_return_string = return_string;
                 Log.d("login_check ", "----------------------check Connectthread : " + final_return_string);
-                if (final_return_string.trim().equals("1")) {
+                if (!final_return_string.trim().equals("2")) {
                     Log.d("login_check", "----------------------check Connectthread - 1: YES!!!!!");
                     /*SharedPrefManager.getInstance(LoginPage.this).setUserID(id);
                     SharedPrefManager.getInstance(LoginPage.this).setUserPW(pw);
                     Const.ROLE = final_return_string;*/
+                    Const.Country = final_return_string.trim();
                     startActivity(new Intent(SigninPage.this, MainActivity.class));
                     runOnUiThread(new Runnable() {
                         @Override
@@ -127,7 +130,7 @@ public class SigninPage extends Activity {
                             bt_login.setEnabled(true);
                         }
                     });
-                } else {
+                } else if(final_return_string.trim().equals("2")){
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
