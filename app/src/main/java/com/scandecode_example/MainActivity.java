@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         today = new Date();
         result = formatter.format(today);
 
-        tv_title.setText("대 한 포 장 ("+Const.Country+")");
+        tv_title.setText("대 한 포 장");
         tv_date.setText(result);
 
         container_no.addTextChangedListener(new TextWatcher() {
@@ -324,7 +324,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                             seal_no.clearFocus();
                                         }else{
                                             button_send.setEnabled(true);
-                                            Toast.makeText(MainActivity.this, "서버에서 문제가 발생하였습니다.", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(MainActivity.this, "서버에 문제가 발생하였습니다.\n데이터가 정상 처리 되지 않았습니다.", Toast.LENGTH_SHORT).show();
                                         }
                                         thread_count = 0;
                                         if(mTimer3!=null) {
@@ -429,7 +429,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void getBarcode(String data) {
                 data = data.trim();
-                if(data.trim().length()== 13){
+                if(data.trim().length()> 10){
                     if(serial_no_flag){
                         if(data.trim().substring(0,3).equals("CP-")){
                             Toast.makeText(MainActivity.this, "오더 번호를 읽어주세요", Toast.LENGTH_SHORT).show();
@@ -438,8 +438,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 scancount+=1;
                                 tv_count.setText(scancount+"");
                                 serial_no_flag = false;
-                                tv_order_no.setText(data.trim().substring(0,data.trim().length()-3));
-                                tv_case_no.setText(data.substring(data.trim().length()-3));
+                                tv_order_no.setText(data.trim().substring(0,10));
+                                tv_case_no.setText(data.substring(10,data.trim().length()));
 
                                 order_array.add(tv_order_no.getText().toString().trim()+tv_case_no.getText().toString().trim());
                                 serial_array.add(tv_serial_no.getText().toString().trim());
@@ -463,8 +463,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     scancount+=1;
                                     tv_count.setText(scancount+"");
                                     serial_no_flag = false;
-                                    tv_order_no.setText(data.substring(0,data.trim().length()-3));
-                                    tv_case_no.setText(data.substring(data.trim().length()-3));
+                                    tv_order_no.setText(data.trim().substring(0,10));
+                                    tv_case_no.setText(data.substring(10,data.trim().length()));
 
                                     order_array.add(tv_order_no.getText().toString().trim()+tv_case_no.getText().toString().trim());
                                     serial_array.add(tv_serial_no.getText().toString().trim());
@@ -545,8 +545,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }else{
                             if(scancount == 0){
                                 order_no_flag= true;
-                                tv_order_no.setText(data.substring(0,data.trim().length()-3));
-                                tv_case_no.setText(data.substring(data.trim().length()-3));
+                                tv_order_no.setText(data.trim().substring(0,10));
+                                tv_case_no.setText(data.substring(10,data.trim().length()));
                             }else{
                                 for(int i=0; i<order_array.size();i++){
                                     if(order_array.get(i).equals(data.trim())){
@@ -558,8 +558,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     Toast.makeText(MainActivity.this, "이미 등록된 오더 번호 입니다.", Toast.LENGTH_SHORT).show();
                                 }else{
                                     order_no_flag= true;
-                                    tv_order_no.setText(data.substring(0,data.trim().length()-3));
-                                    tv_case_no.setText(data.substring(data.trim().length()-3));
+                                    tv_order_no.setText(data.trim().substring(0,10));
+                                    tv_case_no.setText(data.substring(10,data.trim().length()));
                                 }
                             }
                         }
@@ -767,6 +767,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 String order_list = "";
                 String serial_list = "";
+                if(order_array.get(0).toString().toUpperCase().substring(0,1).equals("P")){
+                    Const.Country = "VNM";
+                }else{
+                    Const.Country = "IND";
+                }
                 for(int i =0;i<order_array.size();i++){
                     order_list = order_list + order_array.get(i) + "/";
                     serial_list = serial_list + serial_array.get(i) + "/";

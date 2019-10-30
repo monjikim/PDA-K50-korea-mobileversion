@@ -184,7 +184,7 @@
             android:enabled="false"
             android:textColor="#FFFFFF"
             android:gravity="top"
-            android:hint="Scan Result"
+            android:hint="결과 창"
             android:scrollbarStyle="insideInset"
             android:scrollbars="vertical"></EditText>
     </ScrollView>
