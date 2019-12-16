@@ -63,7 +63,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     int mStatus3 = 0;
     boolean thread_check = false;
     String server_return_string;
-    String const_ip = "119.201.111.73:7778";
+    String const_ip = "www.npc-rental.com:7778"; //aws 서버
+    //String const_ip = "119.201.111.73:7778"; //영천 서버
+
     //String const_ip = "124.194.93.51:7778";
     EditText container_no,seal_no;
     int thread_count = 0;
@@ -694,63 +696,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         intent.setAction(START_SCAN_ACTION);
         sendBroadcast(intent, null);
     }
-    /*android.content.Intent intent) {
-        String action = intent.getAction();
-        if (action.equals(RECE_DATA_ACTION)) {
-            String data = intent.getStringExtra("se4500");
-            mReception.append(data+"\n");
-            if (isRepeat) {
 
-                //cancelRepeat();
-                //repeatScan();
-
-
-            }
-        }
-    }
-*/
-
-/*
-
-
-    //Brief description:
-    //Need “SystemProperties.jar”file.
-
-    //Turn on/off Hotkey Scanning
-    persist.sys.keyreport
-
-    //Barcode scanning results are output to cursor focus
-    persist.sys.keyreportshow
-
-    //Turn on/off warning tone
-    persist.sys.playscanmusic
-
-    //Turn on/off vibrate
-    persist.sys.scanvibrate
-
-    //Barcode scanning results, with keys
-    persist.sys.keywithoutkey
-
-    //Barcode scanning results, with tab key
-    persist.sys.keytab
-
-    //Barcode scanning results, with enter key
-    persist.sys.keyenter
-
-
-    if(ReportshowisChecked){
-            SystemProperties.set("persist.sys.keyreportshow","true");
-    }else{
-        SystemProperties.set("persist.sys.keyreportshow","false");
-    }
-
-    if(PlayMusicisChecked){
-        SystemProperties.set("persist.sys.playscanmusic","true");
-    }else{
-        SystemProperties.set("persist.sys.playscanmusic","false");
-    }
-
-*/
 
     class SendThread extends Thread {
         String table_no;
@@ -787,6 +733,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 buffer += ("container_no") + ("=") + (container_no.getText())+"&";           // 변수 구분은 '&' 사용
                 buffer += ("order_no") + ("=") + (order_list)+"&";           // 변수 구분은 '&' 사용
                 buffer += ("country") + ("=") + (Const.Country)+"&";           // 변수 구분은 '&' 사용
+                buffer += ("company_id") + ("=") + (Const.company_id)+"&";           // 변수 구분은 '&' 사용
+                buffer += ("User_id_no") + ("=") + (Const.User_id_no)+"&";           // 변수 구분은 '&' 사용
                 buffer += ("serial_no") + ("=") + serial_list;
                 Log.d("check",buffer);
 

@@ -12,6 +12,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
@@ -24,7 +27,9 @@ public class SigninPage extends Activity {
 
     EditText et_id,et_pw;
     Button bt_login;
-    String const_ip = "119.201.111.73:7778";
+    String token_value;
+    String const_ip = "www.npc-rental.com:7778"; //aws 서버
+    //String const_ip = "119.201.111.73:7778"; //영천 서버
     //String const_ip = "124.194.93.51:7778";
 
 
@@ -68,7 +73,7 @@ public class SigninPage extends Activity {
             Toast.makeText(this, "Please Check ID and Password", Toast.LENGTH_SHORT).show();
             bt_login.setEnabled(true);
         }else{
-            ServerLogin id_check = new ServerLogin(log_in_id,log_in_pw);
+            AWSServerLogin id_check = new AWSServerLogin(log_in_id,log_in_pw);
             try {
                 id_check.start();
             }catch (Exception e){
@@ -151,6 +156,151 @@ public class SigninPage extends Activity {
                         bt_login.setEnabled(true);
                     }
                 });
+                ex.printStackTrace();
+            }
+        }
+    }
+    class AWSServerLogin extends Thread {
+        String id;
+        String pw;
+
+
+        public AWSServerLogin(String user_id, String user_pw) {
+            id = user_id;
+            pw = user_pw;
+        }
+
+        public void run() {
+            try {
+
+                PrintStream ps = null;
+                URL url = new URL("http://www.npc-rental.com:1337/auth/local");       // URL 설정
+                Log.d("sw : ","http://www.npc-rental.com:1337/auth/local");
+                URLConnection con = url.openConnection();   // 접속
+                con.setDoOutput(true);
+                ps = new PrintStream(con.getOutputStream());
+                String buffer = "";
+
+                /*buffer += ("id") + ("=") + (id) + "&";            // 변수 구분은 '&' 사용
+                buffer += ("pw") + ("=") + (pw);           // 변수 구분은 '&' 사용*/
+                buffer += ("identifier") + ("=") + (id) + "&";            // 변수 구분은 '&' 사용
+                buffer += ("password") + ("=") + (pw);           // 변수 구분은 '&' 사용
+                Log.d("check", buffer);
+
+                ps.print(buffer);
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                InputStream in = con.getInputStream();
+                InputStreamReader isw = new InputStreamReader(in);
+
+                String return_string = "";
+                int data = isw.read();
+                while (data != -1) {
+                    char current = (char) data;
+                    data = isw.read();
+                    return_string += current;
+                }
+                Log.d("check", return_string);
+                String final_return_string = return_string;
+                Log.d("login_check ", "----------------------check Connectthread : " + final_return_string.contains("jwt"));
+//                if (final_return_string.trim().equals("1")) {
+                if (final_return_string.contains("jwt") && final_return_string.contains("user")) {
+                    JSONObject obj = new JSONObject(final_return_string);
+                    token_value = obj.getString("jwt");
+                    Const.Tokeninfo = token_value;
+                    //token_value = final_return_string.substring();
+                    Log.d("login_check", "//////////////////////////////////////////////JWT : "+token_value);
+                    Log.d("login_check", "----------------------check Connectthread - 1: YES!!!!!");
+                    /*SharedPrefManager.getInstance(LoginPage.this).setUserID(id);
+                    SharedPrefManager.getInstance(LoginPage.this).setUserPW(pw);
+                    Const.ROLE = final_return_string;*/
+                    Const.User_id = id;
+                    String query = "query {\n" +
+                            "  users(where: { username: \""+Const.User_id+"\" }) {\n" +
+                            "    company {\n" +
+                            "      name\n" +
+                            "      id\n" +
+                            "    }\n" +
+                            "   id\n" +
+                            "  }\n" +
+                            "}\n";
+                    LoginThread thread = new LoginThread(query);
+                    try {
+                        thread.start();
+                    } catch (Exception e) {
+                        Log.d("abc", "thread error ///////////////////////////// ");
+                    }
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            bt_login.setEnabled(true);
+                        }
+                    });
+                }else {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(SigninPage.this, "Please Check ID and Password", Toast.LENGTH_SHORT).show();
+                            bt_login.setEnabled(true);
+                        }
+                    });
+                }
+                isw.close();
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                ps.flush();
+                ps.close();
+            } catch (Exception ex) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(SigninPage.this, "Please Check Internet Connection", Toast.LENGTH_SHORT).show();
+                        bt_login.setEnabled(true);
+                    }
+                });
+                ex.printStackTrace();
+            }
+        }
+    }
+    class LoginThread extends Thread {
+        String rfid_tag;
+        public LoginThread(String rfid) {
+            rfid_tag = rfid;
+        }
+        public void run() {
+            try {
+                PrintStream ps = null;
+                URL url = new URL("http://www.npc-rental.com:1337/graphql");       // URL 설정
+                URLConnection con = url.openConnection();   // 접속
+                con.setRequestProperty("Authorization","Bearer "+token_value);
+                con.setRequestProperty("Method","POST");
+                con.setDoOutput(true);
+                ps = new PrintStream(con.getOutputStream());
+                String buffer = "";
+                buffer += ("query") + ("=") + (rfid_tag);           // 변수 구분은 '&' 사용
+                Log.d("check",buffer);
+
+                ps.print(buffer);
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                InputStream in = con.getInputStream();
+
+                BufferedReader r = new BufferedReader(new InputStreamReader(in));
+                String return_string = "";
+                StringBuilder total = new StringBuilder();
+                for (String line; (line = r.readLine()) != null; ) {
+                    total.append(line).append('\n');
+                }
+                return_string = total.toString();
+                Log.d("check",return_string);
+
+                JSONObject obj = new JSONObject(return_string);
+                Const.company_id= obj.getJSONObject("data").getJSONArray("users").getJSONObject(0).getJSONObject("company").getString("id");
+                Const.User_id_no= obj.getJSONObject("data").getJSONArray("users").getJSONObject(0).getString("id");
+
+                startActivity(new Intent(SigninPage.this, MainActivity.class));
+                ps.flush();
+                ps.close();
+
+            } catch (Exception ex) {
+                Toast.makeText(SigninPage.this, "Don't have permission to use this app", Toast.LENGTH_SHORT).show();
                 ex.printStackTrace();
             }
         }
