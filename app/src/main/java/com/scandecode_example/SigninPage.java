@@ -293,6 +293,7 @@ public class SigninPage extends Activity {
 
                 JSONObject obj = new JSONObject(return_string);
                 Const.company_id= obj.getJSONObject("data").getJSONArray("users").getJSONObject(0).getJSONObject("company").getString("id");
+                Const.company_name= obj.getJSONObject("data").getJSONArray("users").getJSONObject(0).getJSONObject("company").getString("name");
                 Const.User_id_no= obj.getJSONObject("data").getJSONArray("users").getJSONObject(0).getString("id");
 
                 startActivity(new Intent(SigninPage.this, MainActivity.class));

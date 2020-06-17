@@ -17,7 +17,7 @@
             android:textColor="#000000"
             android:id="@+id/tv_title"
             android:textSize="25sp"
-            android:text="대 한 포 장"
+            android:text="업체 명"
             android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />

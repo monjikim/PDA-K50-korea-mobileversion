@@ -19,7 +19,7 @@
             android:layout_height="100dp">
             <TextView
                 android:gravity="center"
-                android:text="대 한 포 장"
+                android:text=""
                 android:textSize="31sp"
                 android:layout_gravity="bottom"
                 android:layout_width="match_parent"
@@ -96,7 +96,13 @@
 
 
         </LinearLayout>
-
+        <TextView
+            android:gravity="bottom"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:text="ver. 1.0.0.1"
+            android:textSize="15sp" />
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

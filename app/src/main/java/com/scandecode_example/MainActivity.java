@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         today = new Date();
         result = formatter.format(today);
 
-        tv_title.setText("대 한 포 장");
+        tv_title.setText(""+Const.company_name);
         tv_date.setText(result);
 
         container_no.addTextChangedListener(new TextWatcher() {
@@ -248,7 +248,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
         });
-
         button_send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -326,7 +325,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                             seal_no.clearFocus();
                                         }else{
                                             button_send.setEnabled(true);
-                                            Toast.makeText(MainActivity.this, "서버에 문제가 발생하였습니다.\n데이터가 정상 처리 되지 않았습니다.", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(MainActivity.this, "표기된 시리얼 번호가 정상 처리 되지 않았습니다.", Toast.LENGTH_SHORT).show();
+                                            String error_serial_no = "";
+                                            String[] err_tmp = server_return_string.split("/");
+                                            for(int j=0;j<err_tmp.length;j++){
+                                                error_serial_no += err_tmp[j]+"\n";
+                                            }
+                                            mReception.setText(error_serial_no); //清屏
+                                            order_array.clear();
+                                            serial_array.clear();
+                                            tv_order_no.setText("");
+                                            tv_case_no.setText("");
+                                            tv_serial_no.setText("");
+                                            order_no_flag = false;
+                                            serial_no_flag= false;
+                                            scancount=0;
+                                            tv_count.setText(scancount+"");
+                                            container_no.clearFocus();
+                                            seal_no.clearFocus();
                                         }
                                         thread_count = 0;
                                         if(mTimer3!=null) {
@@ -705,8 +721,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         public void run() {
             try {
                 PrintStream ps = null;
-                URL url = new URL("http://"+const_ip+"/npc_youngchun/from_korea_package/receive_data.php");       // URL 설정
-                Log.d("sw : ","http://"+const_ip+"/npc_youngchun/from_korea_package/receive_data.php");
+//                URL url = new URL("http://"+const_ip+"/npc_youngchun/from_korea_package/receive_data.php");       // URL 설정
+//                Log.d("sw : ","http://"+const_ip+"/npc_youngchun/from_korea_package/receive_data.php");
+                URL url = new URL("http://"+const_ip+"/npc_youngchun/from_package/receive_data.php");       // URL 설정
+                Log.d("sw : ","http://"+const_ip+"/npc_youngchun/from_package/receive_data.php");
                 URLConnection con = url.openConnection();   // 접속
                 con.setDoOutput(true);
                 ps = new PrintStream(con.getOutputStream());

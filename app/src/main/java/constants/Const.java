@@ -9,5 +9,6 @@ public class Const {
     public static boolean changing_lang = false;
     public static String Tokeninfo = null;
     public static String company_id = null;
+    public static String company_name = null;
 
 }
