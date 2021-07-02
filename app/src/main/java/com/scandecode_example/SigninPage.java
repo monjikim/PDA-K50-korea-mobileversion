@@ -1,10 +1,16 @@
 package com.scandecode_example;
 
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -38,6 +44,8 @@ public class SigninPage extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.log_in);
 
+        //Camera permission
+        checkDangerousPermissions();
         et_id = (EditText) findViewById(R.id.et_id);
         et_pw = (EditText) findViewById(R.id.et_pw);
         bt_login = (Button) findViewById(R.id.bt_login);
@@ -303,6 +311,31 @@ public class SigninPage extends Activity {
             } catch (Exception ex) {
                 Toast.makeText(SigninPage.this, "Don't have permission to use this app", Toast.LENGTH_SHORT).show();
                 ex.printStackTrace();
+            }
+        }
+    }
+
+    private void checkDangerousPermissions() {
+        String[] permissions = {
+                Manifest.permission.CAMERA,
+        };
+        int permissionCheck = PackageManager.PERMISSION_GRANTED;
+        for (int i = 0; i < permissions.length; i++) {
+            permissionCheck = ContextCompat.checkSelfPermission(this, permissions[i]);
+            if (permissionCheck == PackageManager.PERMISSION_DENIED) {
+                break;
+            }
+        }
+
+        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+            //Toast.makeText(this, "권한 있음", Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(this, "권한 없음", Toast.LENGTH_LONG).show();
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, permissions[0])) {
+                Toast.makeText(this, "권한 설명 필요함.", Toast.LENGTH_LONG).show();
+            } else {
+                ActivityCompat.requestPermissions(this, permissions, 1);
             }
         }
     }

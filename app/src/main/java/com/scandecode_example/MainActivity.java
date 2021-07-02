@@ -3,6 +3,8 @@ package com.scandecode_example;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.media.ToneGenerator;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemProperties;
@@ -23,10 +25,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.google.zxing.Result;
 import com.scandecode.ScanDecode;
 import com.scandecode.inf.ScanInterface;
 import com.speedata.libutils.DataConversionUtils;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
@@ -34,21 +38,23 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import constants.Const;
+import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements ZXingScannerView.ResultHandler {
     private EditText mReception;
     private TextView tvcound;
     private Button btnSingleScan, btnClear, btnTouch;
     private ToggleButton toggleButtonRepeat,toggleButtonSound,toggleButtonVibrate;
     private boolean isFlag = false;
     private int scancount = 0;
-    private ScanInterface scanDecode;
+//    private ScanInterface scanDecode;
     boolean order_no_flag = false;
     boolean serial_no_flag = false;
     TextView tv_order_no,tv_case_no,tv_date,tv_serial_no,tv_count,tv_title;
@@ -70,13 +76,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     EditText container_no,seal_no;
     int thread_count = 0;
 
+
+    ZXingScannerView barcode_scanner;
+
+
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        scanDecode = new ScanDecode(this);
-        scanDecode.initService("true");//初始化扫描服务
+//        scanDecode = new ScanDecode(this);
+//        scanDecode.initService("true");//初始化扫描服务
         //btnSingleScan = (Button) findViewById(R.id.buttonscan);
         btnClear = (Button) findViewById(R.id.buttonclear);
         toggleButtonRepeat = (ToggleButton) findViewById(R.id.button_repeat);
@@ -84,7 +94,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //        btnStop = (Button) findViewById(R.id.buttonstop);
 //        btnStop.setOnClickListener(this);
         tvcound = (TextView) findViewById(R.id.tv_cound);
-        btnClear.setOnClickListener(this);
+        //btnClear.setOnClickListener(this);
+        btnClear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(scancount == 0){
+
+                }else{
+                    Toast.makeText(MainActivity.this, "초기화 하였습니다", Toast.LENGTH_SHORT).show();
+                }
+                container_no.setText("");
+                seal_no.setText("");
+                mReception.setText(""); //清屏
+                order_array.clear();
+                serial_array.clear();
+                tv_order_no.setText("");
+                tv_case_no.setText("");
+                tv_serial_no.setText("");
+                order_no_flag = false;
+                serial_no_flag= false;
+                scancount=0;
+                tv_count.setText(scancount+"");
+            }
+        });
         //btnTouch = (Button) findViewById(R.id.buttonscan);
         //toggleButtonSound =(ToggleButton) findViewById(R.id.butSound);
         //toggleButtonVibrate = (ToggleButton) findViewById(R.id.butVibrate);
@@ -101,6 +133,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         seal_no = (EditText)findViewById(R.id.seal_no);
         tv_count = (TextView)findViewById(R.id.tv_count);
         tv_title = (TextView)findViewById(R.id.tv_title);
+
+        //zxing
+        barcode_scanner = (ZXingScannerView)findViewById(R.id.barcode_scanner);
 
         order_array = new ArrayList();
         serial_array = new ArrayList();
@@ -401,17 +436,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onCheckedChanged(CompoundButton buttonView,
                                          boolean isChecked) {
                 if (isChecked) {
-                    if(!scan_start){
-                        scan_start = true;
-                        startScan();
-                    }
+//                    if(!scan_start){
+//                        scan_start = true;
+//                        startScan();
+//                    }
                     /*scancount = 0;
                     handler.removeCallbacks(startTask);
                     handler.postDelayed(startTask, 0);*/
+                    ////////////////////////
+                    barcode_scanner.setResultHandler(MainActivity.this);
+                    barcode_scanner.startCamera();
+                    barcode_scanner.setVisibility(View.VISIBLE);
+                    ////////////////////////
                 } else {
-                    scan_start = false;
-                    handler.removeCallbacks(startTask);
-                    scanDecode.stopScan();
+//                    scan_start = false;
+//                    handler.removeCallbacks(startTask);
+//                    scanDecode.stopScan();
+
+
+                    ////////////////////////
+                    barcode_scanner.stopCamera();
+                    barcode_scanner.setVisibility(View.INVISIBLE);
+                    ////////////////////////
                 }
             }
         });
@@ -442,211 +488,214 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             }
         });*/
+//
+//        scanDecode.getBarCode(new ScanInterface.OnScanListener() {
+//            @Override
+//            public void getBarcode(String data) {
+//                data = data.trim();
+//                if(data.trim().length()> 10){
+//                    if(serial_no_flag){
+//                        if(data.trim().substring(0,3).equals("CP-")){
+//                            Toast.makeText(MainActivity.this, "오더 번호를 읽어주세요", Toast.LENGTH_SHORT).show();
+//                        }else{
+//                            if(scancount == 0){
+//                                scancount+=1;
+//                                tv_count.setText(scancount+"");
+//                                serial_no_flag = false;
+//                                tv_order_no.setText(data.trim().substring(0,10));
+//                                tv_case_no.setText(data.substring(10,data.trim().length()));
+//
+//                                order_array.add(tv_order_no.getText().toString().trim()+tv_case_no.getText().toString().trim());
+//                                serial_array.add(tv_serial_no.getText().toString().trim());
+//
+//                                mReception.append(scancount+" "+tv_order_no.getText()+" "+tv_case_no.getText()+" "+tv_serial_no.getText()+"\n");
+//
+//                                tv_order_no.setText("");
+//                                tv_case_no.setText("");
+//                                tv_serial_no.setText("");
+//                                Log.d("sw","LOGGGGGGGGGGGGGGGGGGGGGG/////"+order_array.toString()+"/////////"+serial_array.toString());
+//                            }else{
+//                                for(int i=0; i<order_array.size();i++){
+//                                    if(order_array.get(i).equals(data.trim())){
+//                                        order_check = true;
+//                                    }
+//                                }
+//                                if(order_check){
+//                                    order_check = false;
+//                                    Toast.makeText(MainActivity.this, "이미 등록된 오더 번호 입니다.", Toast.LENGTH_SHORT).show();
+//                                }else{
+//                                    scancount+=1;
+//                                    tv_count.setText(scancount+"");
+//                                    serial_no_flag = false;
+//                                    tv_order_no.setText(data.trim().substring(0,10));
+//                                    tv_case_no.setText(data.substring(10,data.trim().length()));
+//
+//                                    order_array.add(tv_order_no.getText().toString().trim()+tv_case_no.getText().toString().trim());
+//                                    serial_array.add(tv_serial_no.getText().toString().trim());
+//                                    mReception.append(scancount+" "+tv_order_no.getText()+" "+tv_case_no.getText()+" "+tv_serial_no.getText()+"\n");
+//
+//                                    tv_order_no.setText("");
+//                                    tv_case_no.setText("");
+//                                    tv_serial_no.setText("");
+//                                    Log.d("sw","LOGGGGGGGGGGGGGGGGGGGGGG/////"+order_array.toString()+"/////////"+serial_array.toString());
+//                                }
+//                            }
+//                        }
+//                    }else if (order_no_flag){
+//                        if(data.substring(0,3).equals("CP-")){
+//                            if(scancount == 0){
+//                                scancount+=1;
+//                                tv_count.setText(scancount+"");
+//                                order_no_flag = false;
+//                                tv_serial_no.setText(data.trim());
+//
+//                                order_array.add(tv_order_no.getText().toString().trim()+tv_case_no.getText().toString().trim());
+//                                serial_array.add(tv_serial_no.getText().toString().trim());
+//
+//                                mReception.append(scancount+" "+tv_order_no.getText()+" "+tv_case_no.getText()+" "+tv_serial_no.getText()+"\n");
+//
+//                                tv_order_no.setText("");
+//                                tv_case_no.setText("");
+//                                tv_serial_no.setText("");
+//                                Log.d("sw","LOGGGGGGGGGGGGGGGGGGGGGG/////"+order_array.toString()+"/////////"+serial_array.toString());
+//                            }else{
+//                                for(int i=0; i<serial_array.size();i++){
+//                                    if(serial_array.get(i).equals(data.trim())){
+//                                       serial_check = true;
+//                                    }
+//                                }
+//                                if(serial_check){
+//                                    serial_check = false;
+//                                    Toast.makeText(MainActivity.this, "이미 등록된 시리얼 번호 입니다.", Toast.LENGTH_SHORT).show();
+//                                }else{
+//                                    scancount+=1;
+//                                    tv_count.setText(scancount+"");
+//                                    order_no_flag = false;
+//                                    tv_serial_no.setText(data.trim());
+//
+//                                    order_array.add(tv_order_no.getText().toString().trim()+tv_case_no.getText().toString().trim());
+//                                    serial_array.add(tv_serial_no.getText().toString().trim());
+//
+//                                    mReception.append(scancount+" "+tv_order_no.getText()+" "+tv_case_no.getText()+" "+tv_serial_no.getText()+"\n");
+//
+//                                    tv_order_no.setText("");
+//                                    tv_case_no.setText("");
+//                                    tv_serial_no.setText("");
+//                                    Log.d("sw","LOGGGGGGGGGGGGGGGGGGGGGG/////"+order_array.toString()+"/////////"+serial_array.toString());
+//                                }
+//                            }
+//                        }else{
+//                            Toast.makeText(MainActivity.this, "시리얼 번호를 읽어주세요", Toast.LENGTH_SHORT).show();
+//                        }
+//                    }else{
+//                        if(data.substring(0,3).equals("CP-")){
+//                            if(scancount == 0){
+//                                serial_no_flag = true;
+//                                tv_serial_no.setText(data.trim());
+//                            }else{
+//                                for(int i=0; i<serial_array.size();i++){
+//                                    if(serial_array.get(i).equals(data.trim())){
+//                                        serial_check = true;
+//                                    }
+//                                }
+//                                if(serial_check){
+//                                    serial_check = false;
+//                                    Toast.makeText(MainActivity.this, "이미 등록된 시리얼 번호 입니다.", Toast.LENGTH_SHORT).show();
+//                                }else{
+//                                    serial_no_flag = true;
+//                                    tv_serial_no.setText(data.trim());
+//                                }
+//                            }
+//                        }else{
+//                            if(scancount == 0){
+//                                order_no_flag= true;
+//                                tv_order_no.setText(data.trim().substring(0,10));
+//                                tv_case_no.setText(data.substring(10,data.trim().length()));
+//                            }else{
+//                                for(int i=0; i<order_array.size();i++){
+//                                    if(order_array.get(i).equals(data.trim())){
+//                                        order_check = true;
+//                                    }
+//                                }
+//                                if(order_check){
+//                                    order_check = false;
+//                                    Toast.makeText(MainActivity.this, "이미 등록된 오더 번호 입니다.", Toast.LENGTH_SHORT).show();
+//                                }else{
+//                                    order_no_flag= true;
+//                                    tv_order_no.setText(data.trim().substring(0,10));
+//                                    tv_case_no.setText(data.substring(10,data.trim().length()));
+//                                }
+//                            }
+//                        }
+//                    }
+//                    /*scancount+=1;
+//                    //tvcound.setText(getString(R.string.scan_time)+scancount+"");
+//                    mReception.append(data+"\n");*/
+//
+//                }else{
+//                    Toast.makeText(MainActivity.this, "Please check barcode No.", Toast.LENGTH_SHORT).show();
+//                }
+//
+//                startScan();
+//            }
+//
+//            @Override
+//            public void getBarcodeByte(byte[] bytes) {
+//                //返回原始解码数据
+////                scancount+=1;
+////                tvcound.setText(getString(R.string.scan_time)+scancount+"");
+////                mReception.append(DataConversionUtils.byteArrayToString(bytes) +"\n");
+//            }
+//        });
 
-        scanDecode.getBarCode(new ScanInterface.OnScanListener() {
-            @Override
-            public void getBarcode(String data) {
-                data = data.trim();
-                if(data.trim().length()> 10){
-                    if(serial_no_flag){
-                        if(data.trim().substring(0,3).equals("CP-")){
-                            Toast.makeText(MainActivity.this, "오더 번호를 읽어주세요", Toast.LENGTH_SHORT).show();
-                        }else{
-                            if(scancount == 0){
-                                scancount+=1;
-                                tv_count.setText(scancount+"");
-                                serial_no_flag = false;
-                                tv_order_no.setText(data.trim().substring(0,10));
-                                tv_case_no.setText(data.substring(10,data.trim().length()));
-
-                                order_array.add(tv_order_no.getText().toString().trim()+tv_case_no.getText().toString().trim());
-                                serial_array.add(tv_serial_no.getText().toString().trim());
-
-                                mReception.append(scancount+" "+tv_order_no.getText()+" "+tv_case_no.getText()+" "+tv_serial_no.getText()+"\n");
-
-                                tv_order_no.setText("");
-                                tv_case_no.setText("");
-                                tv_serial_no.setText("");
-                                Log.d("sw","LOGGGGGGGGGGGGGGGGGGGGGG/////"+order_array.toString()+"/////////"+serial_array.toString());
-                            }else{
-                                for(int i=0; i<order_array.size();i++){
-                                    if(order_array.get(i).equals(data.trim())){
-                                        order_check = true;
-                                    }
-                                }
-                                if(order_check){
-                                    order_check = false;
-                                    Toast.makeText(MainActivity.this, "이미 등록된 오더 번호 입니다.", Toast.LENGTH_SHORT).show();
-                                }else{
-                                    scancount+=1;
-                                    tv_count.setText(scancount+"");
-                                    serial_no_flag = false;
-                                    tv_order_no.setText(data.trim().substring(0,10));
-                                    tv_case_no.setText(data.substring(10,data.trim().length()));
-
-                                    order_array.add(tv_order_no.getText().toString().trim()+tv_case_no.getText().toString().trim());
-                                    serial_array.add(tv_serial_no.getText().toString().trim());
-                                    mReception.append(scancount+" "+tv_order_no.getText()+" "+tv_case_no.getText()+" "+tv_serial_no.getText()+"\n");
-
-                                    tv_order_no.setText("");
-                                    tv_case_no.setText("");
-                                    tv_serial_no.setText("");
-                                    Log.d("sw","LOGGGGGGGGGGGGGGGGGGGGGG/////"+order_array.toString()+"/////////"+serial_array.toString());
-                                }
-                            }
-                        }
-                    }else if (order_no_flag){
-                        if(data.substring(0,3).equals("CP-")){
-                            if(scancount == 0){
-                                scancount+=1;
-                                tv_count.setText(scancount+"");
-                                order_no_flag = false;
-                                tv_serial_no.setText(data.trim());
-
-                                order_array.add(tv_order_no.getText().toString().trim()+tv_case_no.getText().toString().trim());
-                                serial_array.add(tv_serial_no.getText().toString().trim());
-
-                                mReception.append(scancount+" "+tv_order_no.getText()+" "+tv_case_no.getText()+" "+tv_serial_no.getText()+"\n");
-
-                                tv_order_no.setText("");
-                                tv_case_no.setText("");
-                                tv_serial_no.setText("");
-                                Log.d("sw","LOGGGGGGGGGGGGGGGGGGGGGG/////"+order_array.toString()+"/////////"+serial_array.toString());
-                            }else{
-                                for(int i=0; i<serial_array.size();i++){
-                                    if(serial_array.get(i).equals(data.trim())){
-                                       serial_check = true;
-                                    }
-                                }
-                                if(serial_check){
-                                    serial_check = false;
-                                    Toast.makeText(MainActivity.this, "이미 등록된 시리얼 번호 입니다.", Toast.LENGTH_SHORT).show();
-                                }else{
-                                    scancount+=1;
-                                    tv_count.setText(scancount+"");
-                                    order_no_flag = false;
-                                    tv_serial_no.setText(data.trim());
-
-                                    order_array.add(tv_order_no.getText().toString().trim()+tv_case_no.getText().toString().trim());
-                                    serial_array.add(tv_serial_no.getText().toString().trim());
-
-                                    mReception.append(scancount+" "+tv_order_no.getText()+" "+tv_case_no.getText()+" "+tv_serial_no.getText()+"\n");
-
-                                    tv_order_no.setText("");
-                                    tv_case_no.setText("");
-                                    tv_serial_no.setText("");
-                                    Log.d("sw","LOGGGGGGGGGGGGGGGGGGGGGG/////"+order_array.toString()+"/////////"+serial_array.toString());
-                                }
-                            }
-                        }else{
-                            Toast.makeText(MainActivity.this, "시리얼 번호를 읽어주세요", Toast.LENGTH_SHORT).show();
-                        }
-                    }else{
-                        if(data.substring(0,3).equals("CP-")){
-                            if(scancount == 0){
-                                serial_no_flag = true;
-                                tv_serial_no.setText(data.trim());
-                            }else{
-                                for(int i=0; i<serial_array.size();i++){
-                                    if(serial_array.get(i).equals(data.trim())){
-                                        serial_check = true;
-                                    }
-                                }
-                                if(serial_check){
-                                    serial_check = false;
-                                    Toast.makeText(MainActivity.this, "이미 등록된 시리얼 번호 입니다.", Toast.LENGTH_SHORT).show();
-                                }else{
-                                    serial_no_flag = true;
-                                    tv_serial_no.setText(data.trim());
-                                }
-                            }
-                        }else{
-                            if(scancount == 0){
-                                order_no_flag= true;
-                                tv_order_no.setText(data.trim().substring(0,10));
-                                tv_case_no.setText(data.substring(10,data.trim().length()));
-                            }else{
-                                for(int i=0; i<order_array.size();i++){
-                                    if(order_array.get(i).equals(data.trim())){
-                                        order_check = true;
-                                    }
-                                }
-                                if(order_check){
-                                    order_check = false;
-                                    Toast.makeText(MainActivity.this, "이미 등록된 오더 번호 입니다.", Toast.LENGTH_SHORT).show();
-                                }else{
-                                    order_no_flag= true;
-                                    tv_order_no.setText(data.trim().substring(0,10));
-                                    tv_case_no.setText(data.substring(10,data.trim().length()));
-                                }
-                            }
-                        }
-                    }
-                    /*scancount+=1;
-                    //tvcound.setText(getString(R.string.scan_time)+scancount+"");
-                    mReception.append(data+"\n");*/
-
-                }else{
-                    Toast.makeText(MainActivity.this, "Please check barcode No.", Toast.LENGTH_SHORT).show();
-                }
-
-                startScan();
-            }
-
-            @Override
-            public void getBarcodeByte(byte[] bytes) {
-                //返回原始解码数据
-//                scancount+=1;
-//                tvcound.setText(getString(R.string.scan_time)+scancount+"");
-//                mReception.append(DataConversionUtils.byteArrayToString(bytes) +"\n");
-            }
-        });
-
+        barcode_scanner.setResultHandler(MainActivity.this);
+        barcode_scanner.startCamera();
+        barcode_scanner.setVisibility(View.VISIBLE);
     }
-    Handler handler = new Handler();
+//    Handler handler = new Handler();
 
     //连续扫描
-    private Runnable startTask = new Runnable() {
-        @Override
-        public void run() {
-            scanDecode.starScan();
-            handler.postDelayed(startTask, 1000);
-        }
-    };
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.buttonclear:
-                if(scancount == 0){
-
-                }else{
-                    Toast.makeText(this, "초기화 하였습니다", Toast.LENGTH_SHORT).show();
-                }
-                container_no.setText("");
-                seal_no.setText("");
-                mReception.setText(""); //清屏
-                order_array.clear();
-                serial_array.clear();
-                tv_order_no.setText("");
-                tv_case_no.setText("");
-                tv_serial_no.setText("");
-                order_no_flag = false;
-                serial_no_flag= false;
-                scancount=0;
-                tv_count.setText(scancount+"");
-                //tvcound.setText(getString(R.string.scan_time)+scancount+"");
-                break;
-            case R.id.buttonscan:
-                scanDecode.starScan();//启动扫描
-                break;
-//            case R.id.buttonstop:
-//                scanDecode.stopScan();//停止扫描
-//                handler.removeCallbacks(startTask);
+//    private Runnable startTask = new Runnable() {
+//        @Override
+//        public void run() {
+//            scanDecode.starScan();
+//            handler.postDelayed(startTask, 1000);
+//        }
+//    };
+    //@Override
+//    public void onClick(View v) {
+//        switch (v.getId()) {
+//            case R.id.buttonclear:
+//                if(scancount == 0){
+//
+//                }else{
+//                    Toast.makeText(this, "초기화 하였습니다", Toast.LENGTH_SHORT).show();
+//                }
+//                container_no.setText("");
+//                seal_no.setText("");
+//                mReception.setText(""); //清屏
+//                order_array.clear();
+//                serial_array.clear();
+//                tv_order_no.setText("");
+//                tv_case_no.setText("");
+//                tv_serial_no.setText("");
+//                order_no_flag = false;
+//                serial_no_flag= false;
+//                scancount=0;
+//                tv_count.setText(scancount+"");
+//                //tvcound.setText(getString(R.string.scan_time)+scancount+"");
 //                break;
-            default:
-                break;
-        }
-    }
+//            case R.id.buttonscan:
+//                scanDecode.starScan();//启动扫描
+//                break;
+////            case R.id.buttonstop:
+////                scanDecode.stopScan();//停止扫描
+////                handler.removeCallbacks(startTask);
+////                break;
+//            default:
+//                break;
+//        }
+//    }
 
     @Override
     protected void onDestroy() {
@@ -657,7 +706,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mTask3.cancel();
             mTask3 = null;
         }
-        scanDecode.onDestroy();//回复初始状态
+//        scanDecode.onDestroy();//回复初始状态
     }
 
 
@@ -713,6 +762,308 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         sendBroadcast(intent, null);
     }
 
+    @Override
+    public void handleResult(Result result) {
+//
+//        if(!car_list.contains(result.getText())){
+//            flag = "camera";
+//            C_Import cthread = new C_Import(result.getText());
+//            cthread.start();
+//        }else{
+//            Toast.makeText(this, "번호를 확인해 주세요", Toast.LENGTH_SHORT).show();
+//
+//            vib.vibrate(new long[]{500,1000,500,1000,500,1000},-1);
+//            tg.startTone(ToneGenerator.TONE_PROP_NACK);
+//            if(isSwitchChecked){
+//                disable_nfc = false;
+//            }
+//            else{
+//                barcode_scanner.setResultHandler(Pallet_Import_NPC.this);
+//                barcode_scanner.startCamera();
+//            }
+//        }
+
+        String data = result.getText().trim();
+        if(data.trim().length()> 10){
+            if(serial_no_flag){
+                if(data.trim().substring(0,3).equals("CP-")){
+                    Toast.makeText(MainActivity.this, "오더 번호를 읽어주세요", Toast.LENGTH_SHORT).show();
+                }else{
+                    if(scancount == 0){
+                        scancount+=1;
+                        tv_count.setText(scancount+"");
+                        serial_no_flag = false;
+                        tv_order_no.setText(data.trim().substring(0,10));
+                        tv_case_no.setText(data.substring(10,data.trim().length()));
+
+                        order_array.add(tv_order_no.getText().toString().trim()+tv_case_no.getText().toString().trim());
+                        serial_array.add(tv_serial_no.getText().toString().trim());
+
+                        mReception.append(scancount+" "+tv_order_no.getText()+" "+tv_case_no.getText()+"\n"+tv_serial_no.getText()+"\n");
+
+                        tv_order_no.setText("");
+                        tv_case_no.setText("");
+                        tv_serial_no.setText("");
+                        Log.d("sw","LOGGGGGGGGGGGGGGGGGGGGGG/////"+order_array.toString()+"/////////"+serial_array.toString());
+                    }else{
+                        for(int i=0; i<order_array.size();i++){
+                            if(order_array.get(i).equals(data.trim())){
+                                order_check = true;
+                            }
+                        }
+                        if(order_check){
+                            order_check = false;
+                            Toast.makeText(MainActivity.this, "이미 등록된 오더 번호 입니다.", Toast.LENGTH_SHORT).show();
+                        }else{
+                            scancount+=1;
+                            tv_count.setText(scancount+"");
+                            serial_no_flag = false;
+                            tv_order_no.setText(data.trim().substring(0,10));
+                            tv_case_no.setText(data.substring(10,data.trim().length()));
+
+                            order_array.add(tv_order_no.getText().toString().trim()+tv_case_no.getText().toString().trim());
+                            serial_array.add(tv_serial_no.getText().toString().trim());
+                            mReception.append(scancount+" "+tv_order_no.getText()+" "+tv_case_no.getText()+"\n"+tv_serial_no.getText()+"\n");
+
+                            tv_order_no.setText("");
+                            tv_case_no.setText("");
+                            tv_serial_no.setText("");
+                            Log.d("sw","LOGGGGGGGGGGGGGGGGGGGGGG/////"+order_array.toString()+"/////////"+serial_array.toString());
+                        }
+                    }
+                }
+            }else if (order_no_flag){
+                if(data.substring(0,3).equals("CP-")){
+                    if(scancount == 0){
+                        scancount+=1;
+                        tv_count.setText(scancount+"");
+                        order_no_flag = false;
+                        tv_serial_no.setText(data.trim());
+
+                        order_array.add(tv_order_no.getText().toString().trim()+tv_case_no.getText().toString().trim());
+                        serial_array.add(tv_serial_no.getText().toString().trim());
+
+                        mReception.append(scancount+" "+tv_order_no.getText()+" "+tv_case_no.getText()+" "+tv_serial_no.getText()+"\n");
+
+                        tv_order_no.setText("");
+                        tv_case_no.setText("");
+                        tv_serial_no.setText("");
+                        Log.d("sw","LOGGGGGGGGGGGGGGGGGGGGGG/////"+order_array.toString()+"/////////"+serial_array.toString());
+                    }else{
+                        for(int i=0; i<serial_array.size();i++){
+                            if(serial_array.get(i).equals(data.trim())){
+                                serial_check = true;
+                            }
+                        }
+                        if(serial_check){
+                            serial_check = false;
+                            Toast.makeText(MainActivity.this, "이미 등록된 시리얼 번호 입니다.", Toast.LENGTH_SHORT).show();
+                        }else{
+                            scancount+=1;
+                            tv_count.setText(scancount+"");
+                            order_no_flag = false;
+                            tv_serial_no.setText(data.trim());
+
+                            order_array.add(tv_order_no.getText().toString().trim()+tv_case_no.getText().toString().trim());
+                            serial_array.add(tv_serial_no.getText().toString().trim());
+
+                            mReception.append(scancount+" "+tv_order_no.getText()+" "+tv_case_no.getText()+" "+tv_serial_no.getText()+"\n");
+
+                            tv_order_no.setText("");
+                            tv_case_no.setText("");
+                            tv_serial_no.setText("");
+                            Log.d("sw","LOGGGGGGGGGGGGGGGGGGGGGG/////"+order_array.toString()+"/////////"+serial_array.toString());
+                        }
+                    }
+                }else{
+                    Toast.makeText(MainActivity.this, "시리얼 번호를 읽어주세요", Toast.LENGTH_SHORT).show();
+                }
+            }else{
+                if(data.substring(0,3).equals("CP-")){
+                    if(scancount == 0){
+                        serial_no_flag = true;
+                        tv_serial_no.setText(data.trim());
+                    }else{
+                        for(int i=0; i<serial_array.size();i++){
+                            if(serial_array.get(i).equals(data.trim())){
+                                serial_check = true;
+                            }
+                        }
+                        if(serial_check){
+                            serial_check = false;
+                            Toast.makeText(MainActivity.this, "이미 등록된 시리얼 번호 입니다.", Toast.LENGTH_SHORT).show();
+                        }else{
+                            serial_no_flag = true;
+                            tv_serial_no.setText(data.trim());
+                        }
+                    }
+                }else{
+                    if(scancount == 0){
+                        order_no_flag= true;
+                        tv_order_no.setText(data.trim().substring(0,10));
+                        tv_case_no.setText(data.substring(10,data.trim().length()));
+                    }else{
+                        for(int i=0; i<order_array.size();i++){
+                            if(order_array.get(i).equals(data.trim())){
+                                order_check = true;
+                            }
+                        }
+                        if(order_check){
+                            order_check = false;
+                            Toast.makeText(MainActivity.this, "이미 등록된 오더 번호 입니다.", Toast.LENGTH_SHORT).show();
+                        }else{
+                            order_no_flag= true;
+                            tv_order_no.setText(data.trim().substring(0,10));
+                            tv_case_no.setText(data.substring(10,data.trim().length()));
+                        }
+                    }
+                }
+            }
+                    /*scancount+=1;
+                    //tvcound.setText(getString(R.string.scan_time)+scancount+"");
+                    mReception.append(data+"\n");*/
+
+        }else{
+            Toast.makeText(MainActivity.this, "Please check barcode No.", Toast.LENGTH_SHORT).show();
+        }
+
+        barcode_scanner.setResultHandler(MainActivity.this);
+        barcode_scanner.startCamera();
+    }
+//
+//    class C_Import extends Thread {
+//        String s_n;
+//
+//
+//        public C_Import(String u_s_n) {
+//            s_n = u_s_n;
+//        }
+//        public void run() {
+//            try {
+//                //////////////////////////////////////////////////////////////////////////////////////////
+//                PrintStream ps = null;
+////                URL url = new URL("http://"+ const_ip+"/EvDemo/save_data.php");       // URL 설정
+////                Log.d("sw : ","http://"+ const_ip+"/EvDemo/save_data.php");       // URL 설정
+//                URL url = new URL("http://"+ const_ip+"/EvDemo/import_check.php");       // URL 설정
+//                Log.d("sw : ","http://"+ const_ip+"/EvDemo/import_check.php");       // URL 설정
+//                //destination = target_numb2.getSelectedItem().toString().trim();
+//                URLConnection con = url.openConnection();   // 접속
+//                con.setDoOutput(true);
+//                ps = new PrintStream(con.getOutputStream());
+//                String buffer = "";
+//
+//                String data_format = "yyyy-MM-dd HH:mm:ss";
+//                SimpleDateFormat df = new SimpleDateFormat(data_format);
+//                Date today = Calendar.getInstance().getTime();
+//
+//                buffer += ("s_n") + ("=") +  (s_n)+"&";            // 변수 구분은 '&' 사용
+//                buffer += ("u_c") + ("=") +  (Const.User_company_idx)+"&";            // 변수 구분은 '&' 사용
+////                buffer += ("u_id") + ("=") +  (Const.User_id_idx)+"&";            // 변수 구분은 '&' 사용
+//                buffer += ("c_d") + ("=") +  (df.format(today));            // 변수 구분은 '&' 사용
+//                Log.d("check",buffer);
+//
+//                ps.print(buffer);
+//                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                InputStream in = con.getInputStream();
+//                InputStreamReader isw = new InputStreamReader(in);
+//
+//                check_return_string = "";
+//
+//                BufferedReader r = new BufferedReader(new InputStreamReader(in));
+//
+//                StringBuilder total = new StringBuilder();
+//                for (String line; (line = r.readLine()) != null; ) {
+//                    total.append(line).append('\n');
+//                }
+//                check_return_string = total.toString().trim();
+//                Log.d("RSB CHECK!!!",check_return_string);
+//
+//                if(check_return_string.trim().equals("1")){
+//                    runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            Edit_popup.setVisibility(View.VISIBLE);
+//                            tv_error_s_n.setText(""+s_n);
+//                            tv_error_detail.setText("등록되지 않은 RSB번호입니다.");
+//                            vib.vibrate(new long[]{500,1000,500,1000,500,1000},-1);
+//                            tg.startTone(ToneGenerator.TONE_PROP_NACK);
+//                            if(isSwitchChecked){
+//                                disable_nfc = false;
+//                            }
+//                            else{
+//                                barcode_scanner.setResultHandler(Pallet_Import_NPC.this);
+//                                barcode_scanner.startCamera();
+//                            }
+//
+//                        }
+//                    });
+//                }
+//                else if(check_return_string.trim().equals("2")){
+//                    runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            Edit_popup.setVisibility(View.VISIBLE);
+//                            tv_error_s_n.setText(""+s_n);
+//                            tv_error_detail.setText("해당 RSB번호의 올바른 입고지가 아닙니다.");
+//                            vib.vibrate(new long[]{500,1000,500,1000,500,1000},-1);
+//                            tg.startTone(ToneGenerator.TONE_PROP_NACK);
+//                            if(isSwitchChecked){
+//                                disable_nfc = false;
+//                            }
+//                            else{
+//                                barcode_scanner.setResultHandler(Pallet_Import_NPC.this);
+//                                barcode_scanner.startCamera();
+//                            }
+//
+//                        }
+//                    });
+//                }
+//                else{
+//                    runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            String[] tmp_check_string = check_return_string.split("/");
+//                            if(user_previous_company.equals("")){
+//                                user_previous_company = tmp_check_string[0];
+//                                user_previous_company_name = tmp_check_string[2];
+////                                Btn_select_company.setText(user_previous_company_name);
+//                            }
+//                            if(user_previous_company.equals(tmp_check_string[0])){
+//                                pallet_count ++;
+//                                tv_pallet_count.setText(pallet_count+"");
+//                                add_row(check_return_string,s_n);
+//                                car_list.add(s_n);
+//
+//                                vib.vibrate(1000);
+//                                tg.startTone(ToneGenerator.TONE_PROP_BEEP);
+//                                if(isSwitchChecked){
+//                                    disable_nfc = false;
+//                                }
+//                                else{
+//                                    barcode_scanner.setResultHandler(Pallet_Import_NPC.this);
+//                                    barcode_scanner.startCamera();
+//                                }
+//
+//                            }
+//                            else{
+//                                Edit_popup.setVisibility(View.VISIBLE);
+//                                tv_error_s_n.setText(""+s_n);
+//                                tv_error_detail.setText("상차지가 다릅니다.");
+//                            }
+//                        }
+//                    });
+//                }
+//                isw.close();
+//                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                //con.getInputStream();
+//                ps.flush();
+//                ps.close();
+//
+//            } catch (Exception ex) {
+//                ex.printStackTrace();
+//            }
+//        }
+//    }
 
     class SendThread extends Thread {
         String table_no;
@@ -785,5 +1136,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if(toggleButtonRepeat.isChecked()){
+            barcode_scanner.resumeCameraPreview(MainActivity.this);
+        }
+    }
+
 
 }
