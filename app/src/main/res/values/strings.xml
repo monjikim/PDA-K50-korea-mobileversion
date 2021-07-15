@@ -7,9 +7,9 @@
     <string name="but_stop">스캔\n중지</string>
     <string name="but_close">Close</string>
     <string name="but_repeat">스캔\n시작</string>
-    <string name="but_clear">작업\n초기화\n버튼</string>
+    <string name="but_clear">작업\n초기화</string>
     <string name="btn_undo">이전 작업\n삭제</string>
-    <string name="btn_send">완료 및\n전송 버튼</string>
+    <string name="btn_send">완료 및\n전송</string>
     <string name="dialog_title">Content</string>
     <string name="spinner">Scan key choose</string>
     

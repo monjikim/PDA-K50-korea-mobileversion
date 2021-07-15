@@ -5,78 +5,95 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <LinearLayout
-        android:background="#C2DEF3"
+    <RelativeLayout
+        android:background="@color/black"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <TextView
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:textColor="#000000"
-            android:id="@+id/tv_title"
-            android:textSize="25sp"
-            android:text="업체 명"
+        android:layout_height="350dp">
+
+        <me.dm7.barcodescanner.zxing.ZXingScannerView
             android:layout_weight="1"
+            android:visibility="invisible"
+            android:padding="5dp"
+            android:id="@+id/barcode_scanner"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="match_parent"
+            android:gravity="center">
+        </me.dm7.barcodescanner.zxing.ZXingScannerView>
         <TextView
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
+            android:layout_alignParentBottom="true"
             android:layout_gravity="center"
             android:gravity="center"
-            android:textColor="#000000"
-            android:background="@color/black"
-            android:textSize="25sp"
-            android:text="0"
-            android:layout_width="2dp"
-            android:layout_height="wrap_content" />
-        <TextView
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:textColor="#000000"
+            android:textColor="#ffffff"
             android:id="@+id/tv_count"
             android:textSize="25sp"
-            android:layout_weight="3"
+            android:layout_weight="5"
             android:text="0"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
+            android:layout_height="50dp" />
+    </RelativeLayout>
     <LinearLayout
         android:orientation="vertical"
         android:layout_marginTop="20dp"
         android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="40dp">
             <TextView
-                android:textSize="20sp"
-                android:text="&#9632; Date : "
+                android:textSize="16sp"
+                android:text="&#9632;"
+                android:gravity="center"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="40dp" />
+            <TextView
+                android:textSize="18sp"
+                android:layout_marginLeft="5dp"
+                android:text=" Date "
+                android:gravity="center_vertical"
+                android:layout_width="120dp"
+                android:layout_height="40dp" />
+            <TextView
+                android:textSize="18sp"
+                android:layout_marginLeft="5dp"
+                android:text=": "
+                android:gravity="center_vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp" />
             <TextView
                 android:id="@+id/tv_date"
-                android:textSize="20sp"
-                android:text=""
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:textSize="18sp"
+                android:text="1234"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="40dp" />
         </LinearLayout>
         <LinearLayout
             android:focusable="true"
             android:focusableInTouchMode="true"
-            android:layout_marginTop="10dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="40dp">
             <TextView
-                android:textSize="20sp"
-                android:text="&#9632; C/T_no : "
+                android:textSize="16sp"
+                android:text="&#9632;"
+                android:gravity="center"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="40dp" />
+            <TextView
+                android:textSize="18sp"
+                android:layout_marginLeft="5dp"
+                android:text=" C/T_no "
+                android:gravity="center_vertical"
+                android:layout_width="120dp"
+                android:layout_height="40dp" />
+            <TextView
+                android:textSize="18sp"
+                android:layout_marginLeft="5dp"
+                android:text=": "
+                android:gravity="center_vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp" />
             <EditText
                 android:inputType="text"
                 android:singleLine="true"
@@ -85,21 +102,34 @@
                 android:id="@+id/container_no"
                 android:maxLength="11"
                 android:maxLines="1"
-                android:textSize="20sp"
+                android:textSize="18sp"
                 android:gravity="center"
-                android:width="150dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_width="match_parent"
+                android:layout_height="40dp" />
         </LinearLayout>
         <LinearLayout
-            android:layout_marginTop="10dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="40dp">
             <TextView
-                android:textSize="20sp"
-                android:text="&#9632; C/T_Seal : "
+                android:textSize="16sp"
+                android:text="&#9632;"
+                android:gravity="center"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="40dp" />
+            <TextView
+                android:textSize="18sp"
+                android:layout_marginLeft="5dp"
+                android:text=" C/T_Seal "
+                android:gravity="center_vertical"
+                android:layout_width="120dp"
+                android:layout_height="40dp" />
+            <TextView
+                android:textSize="18sp"
+                android:layout_marginLeft="5dp"
+                android:text=": "
+                android:gravity="center_vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp" />
             <EditText
                 android:singleLine="true"
                 android:nextFocusForward="@id/tv_serial_no"
@@ -107,59 +137,100 @@
                 android:id="@+id/seal_no"
                 android:maxLength="10"
                 android:maxLines="1"
-                android:textSize="20sp"
+                android:textSize="18sp"
                 android:gravity="center"
-                android:width="130dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_width="match_parent"
+                android:layout_height="40dp" />
         </LinearLayout>
         <LinearLayout
-            android:layout_marginTop="10dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="40dp">
             <TextView
-                android:textSize="20sp"
-                android:text="&#9632; Order_no : "
+                android:textSize="16sp"
+                android:text="&#9632;"
+                android:gravity="center"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="40dp" />
+            <TextView
+                android:textSize="18sp"
+                android:layout_marginLeft="5dp"
+                android:text=" Order_no "
+                android:gravity="center_vertical"
+                android:layout_width="120dp"
+                android:layout_height="40dp" />
+            <TextView
+                android:textSize="18sp"
+                android:layout_marginLeft="5dp"
+                android:text=": "
+                android:gravity="center_vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp" />
             <TextView
                 android:id="@+id/tv_order_no"
-                android:textSize="20sp"
-                android:text=""
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:textSize="18sp"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="40dp" />
         </LinearLayout>
         <LinearLayout
-            android:layout_marginTop="10dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="40dp">
             <TextView
-                android:textSize="20sp"
-                android:text="&#9632; Case_no : "
+                android:textSize="16sp"
+                android:text="&#9632;"
+                android:gravity="center"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="40dp" />
+            <TextView
+                android:textSize="18sp"
+                android:layout_marginLeft="5dp"
+                android:text=" Case_no "
+                android:gravity="center_vertical"
+                android:layout_width="120dp"
+                android:layout_height="40dp" />
+            <TextView
+                android:textSize="18sp"
+                android:layout_marginLeft="5dp"
+                android:text=": "
+                android:gravity="center_vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp" />
             <TextView
                 android:id="@+id/tv_case_no"
-                android:textSize="20sp"
-                android:text=""
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:textSize="18sp"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="40dp" />
         </LinearLayout>
         <LinearLayout
-            android:layout_marginTop="10dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="40dp">
             <TextView
-                android:textSize="20sp"
-                android:text="&#9632; RSB Serial_no : "
+                android:textSize="16sp"
+                android:text="&#9632;"
+                android:gravity="center"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="40dp" />
+            <TextView
+                android:textSize="18sp"
+                android:layout_marginLeft="5dp"
+                android:text=" Serial_no "
+                android:gravity="center_vertical"
+                android:layout_width="120dp"
+                android:layout_height="40dp" />
+            <TextView
+                android:textSize="18sp"
+                android:layout_marginLeft="5dp"
+                android:text=": "
+                android:gravity="center_vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp" />
             <TextView
                 android:id="@+id/tv_serial_no"
-                android:textSize="20sp"
-                android:text=""
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:textSize="18sp"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="40dp" />
         </LinearLayout>
 
     </LinearLayout>
@@ -169,6 +240,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
     <LinearLayout
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
         android:layout_weight="1"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -191,15 +264,6 @@
                 android:scrollbarStyle="insideInset"
                 android:scrollbars="vertical"></EditText>
         </ScrollView>
-        <me.dm7.barcodescanner.zxing.ZXingScannerView
-            android:layout_weight="1"
-            android:visibility="visible"
-            android:padding="5dp"
-            android:id="@+id/barcode_scanner"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center">
-        </me.dm7.barcodescanner.zxing.ZXingScannerView>
     </LinearLayout>
 
     <LinearLayout
@@ -221,7 +285,7 @@
         tools:ignore="DuplicateIds">
 
         <ToggleButton
-            android:checked="true"
+            android:checked="false"
             android:id="@+id/button_repeat"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"

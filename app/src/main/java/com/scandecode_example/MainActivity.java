@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
 //    private ScanInterface scanDecode;
     boolean order_no_flag = false;
     boolean serial_no_flag = false;
-    TextView tv_order_no,tv_case_no,tv_date,tv_serial_no,tv_count,tv_title;
+    TextView tv_order_no,tv_case_no,tv_date,tv_serial_no,tv_count;
     ArrayList order_array;
     ArrayList serial_array;
     Button button_undo,button_send;
@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
         container_no = (EditText)findViewById(R.id.container_no);
         seal_no = (EditText)findViewById(R.id.seal_no);
         tv_count = (TextView)findViewById(R.id.tv_count);
-        tv_title = (TextView)findViewById(R.id.tv_title);
+//        tv_title = (TextView)findViewById(R.id.tv_title);
 
         //zxing
         barcode_scanner = (ZXingScannerView)findViewById(R.id.barcode_scanner);
@@ -148,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
         today = new Date();
         result = formatter.format(today);
 
-        tv_title.setText(""+Const.company_name);
+//        tv_title.setText(""+Const.company_name);
         tv_date.setText(result);
 
         container_no.addTextChangedListener(new TextWatcher() {
@@ -648,9 +648,9 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
 //            }
 //        });
 
-        barcode_scanner.setResultHandler(MainActivity.this);
-        barcode_scanner.startCamera();
-        barcode_scanner.setVisibility(View.VISIBLE);
+//        barcode_scanner.setResultHandler(MainActivity.this);
+//        barcode_scanner.startCamera();
+//        barcode_scanner.setVisibility(View.VISIBLE);
     }
 //    Handler handler = new Handler();
 

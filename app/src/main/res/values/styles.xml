@@ -8,4 +8,10 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <!-- Base application theme. -->
+    <style name="EditTextStyle" parent="Theme.AppCompat.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorControlNormal">@color/amber500</item>
+        <item name="colorControlActivated">@color/amber500</item>
+    </style>
 </resources>

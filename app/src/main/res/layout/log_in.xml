@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <LinearLayout
+        android:background="#ffffff"
         android:id="@+id/linearLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -14,21 +16,38 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="100dp">
-            <TextView
-                android:gravity="center"
-                android:text=""
-                android:textSize="31sp"
-                android:layout_gravity="bottom"
+            android:layout_height="150dp">
+            <RelativeLayout
+                android:layout_centerInParent="true"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
+                android:layout_height="wrap_content">
+                <TextView
+                    android:paddingLeft="90dp"
+                    android:paddingRight="20dp"
+                    android:layout_centerHorizontal="true"
+                    android:id="@+id/title"
+                    android:textSize="25sp"
+                    android:gravity="center"
+                    android:textColor="#000000"
+                    android:text="QR Scanner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"/>
+
+                <ImageView
+                    android:layout_alignLeft="@+id/title"
+                    android:layout_centerVertical="true"
+                    android:paddingTop="5dp"
+                    android:src="@drawable/npc_icon"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp" />
+            </RelativeLayout>
+        </RelativeLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="100dp"
+            android:layout_marginTop="150dp"
             android:orientation="vertical">
 
             <LinearLayout
@@ -37,6 +56,7 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    android:textColor="#303030"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="40dp"
@@ -44,6 +64,7 @@
                     android:textSize="25sp" />
 
                 <TextView
+                    android:textColor="#303030"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="21dp"
@@ -51,9 +72,12 @@
                     android:textSize="25sp" />
 
                 <EditText
+                    android:backgroundTint="#303030"
+                    android:textColor="#303030"
                     android:text="dk"
                     android:id="@+id/et_id"
-                    android:layout_width="200dp"
+                    android:layout_marginRight="40dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="20dp"
                     android:maxLines="1"
@@ -69,6 +93,7 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    android:textColor="#303030"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="40dp"
@@ -76,9 +101,12 @@
                     android:textSize="25sp" />
 
                 <EditText
+                    android:backgroundTint="#303030"
+                    android:textColor="#303030"
                     android:text="00000000"
                     android:id="@+id/et_pw"
-                    android:layout_width="200dp"
+                    android:layout_marginRight="40dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="20dp"
                     android:imeOptions="actionDone"
@@ -88,6 +116,8 @@
             </LinearLayout>
 
             <Button
+                android:textColor="#ffffff"
+                android:background="#303030"
                 android:id="@+id/bt_login"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
@@ -99,11 +129,14 @@
 
         </LinearLayout>
         <TextView
-            android:gravity="bottom"
+            android:textColor="#303030"
+            android:gravity="bottom|center_horizontal"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_marginBottom="20dp"
+            android:lineHeight="23sp"
             android:layout_gravity="center"
-            android:text="ver. 1.0.0.1"
+            android:text="RSP Pallet\nAndroid OS\nver. 1.0.0.1"
             android:textSize="15sp" />
     </LinearLayout>
 
