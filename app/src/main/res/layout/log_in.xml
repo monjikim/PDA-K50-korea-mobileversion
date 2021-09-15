@@ -74,7 +74,7 @@
                 <EditText
                     android:backgroundTint="#303030"
                     android:textColor="#303030"
-                    android:text="dk"
+                    android:text=""
                     android:id="@+id/et_id"
                     android:layout_marginRight="40dp"
                     android:layout_width="match_parent"
@@ -103,7 +103,7 @@
                 <EditText
                     android:backgroundTint="#303030"
                     android:textColor="#303030"
-                    android:text="00000000"
+                    android:text=""
                     android:id="@+id/et_pw"
                     android:layout_marginRight="40dp"
                     android:layout_width="match_parent"

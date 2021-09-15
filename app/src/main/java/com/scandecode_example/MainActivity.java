@@ -1,8 +1,11 @@
 package com.scandecode_example;
 
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.media.ToneGenerator;
 import android.os.Bundle;
@@ -28,6 +31,7 @@ import android.widget.ToggleButton;
 import com.google.zxing.Result;
 import com.scandecode.ScanDecode;
 import com.scandecode.inf.ScanInterface;
+import com.scandecode_example.etc.PlayService;
 import com.speedata.libutils.DataConversionUtils;
 
 import java.io.BufferedReader;
@@ -462,6 +466,16 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
             }
         });
 
+        registerReceiver(reciever, new IntentFilter());
+
+        Intent intent=new Intent(this, PlayService.class);
+        intent.putExtra("msgs", mReception.getText());
+        Log.e("MainActivity","before startservice");
+        Log.e("MainActivity",mReception.getText()+"");
+        startService(intent);
+        Log.e("MainActivity","after startservice");
+        Log.e("MainActivity",mReception.getText()+"");
+
         /*toggleButtonSound.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton,
@@ -697,6 +711,17 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
 //        }
 //    }
 
+    BroadcastReceiver reciever=new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String msgs=intent.getStringExtra("msgs");
+            Log.e("MainActivity","BroadcastReceiver");
+            Log.e("MainActivity",msgs+"");
+            if(msgs != null){
+                //mReception.setText(msgs);
+            }
+        }
+    };
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -706,6 +731,8 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
             mTask3.cancel();
             mTask3 = null;
         }
+        Log.e("MainActivity","ondestroy");
+        unregisterReceiver(reciever);
 //        scanDecode.onDestroy();//回复初始状态
     }
 

@@ -18,6 +18,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.scandecode_example.etc.SharedPreferenceManager;
+
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -29,11 +31,15 @@ import java.net.URLConnection;
 
 import constants.Const;
 
+import static constants.Const.User_id;
+import static constants.Const.User_pw;
+
 public class SigninPage extends Activity {
 
     EditText et_id,et_pw;
     Button bt_login;
     String token_value;
+    String u_id,u_pw;
     String const_ip = "www.npc-rental.com:7778"; //aws 서버
     //String const_ip = "119.201.111.73:7778"; //영천 서버
     //String const_ip = "124.194.93.51:7778";
@@ -70,6 +76,27 @@ public class SigninPage extends Activity {
                 check_log_in();
             }
         });
+
+        u_id = User_id;
+        u_id = SharedPreferenceManager.getString(getApplicationContext(),"USER_ID");
+        if(u_id == ""){
+            SharedPreferenceManager.setString(getApplicationContext(), "USER_ID", "");
+            u_id = "";
+        }
+        else if(u_id == User_id){
+            SharedPreferenceManager.setString(getApplicationContext(), "USER_ID", User_id);
+        }
+        u_pw = User_pw;
+        u_pw = SharedPreferenceManager.getString(getApplicationContext(),"USER_PW");
+        if(u_pw == ""){
+            SharedPreferenceManager.setString(getApplicationContext(), "USER_PW", "");
+            u_pw = "";
+        }
+        else if(u_pw == User_pw){
+            SharedPreferenceManager.setString(getApplicationContext(), "USER_PW", User_pw);
+        }
+        et_id.setText(u_id);
+        et_pw.setText(u_pw);
 
     }
 
@@ -221,9 +248,9 @@ public class SigninPage extends Activity {
                     /*SharedPrefManager.getInstance(LoginPage.this).setUserID(id);
                     SharedPrefManager.getInstance(LoginPage.this).setUserPW(pw);
                     Const.ROLE = final_return_string;*/
-                    Const.User_id = id;
+                    User_id = id;
                     String query = "query {\n" +
-                            "  users(where: { username: \""+Const.User_id+"\" }) {\n" +
+                            "  users(where: { username: \""+ User_id+"\" }) {\n" +
                             "    company {\n" +
                             "      name\n" +
                             "      id\n" +
@@ -303,6 +330,10 @@ public class SigninPage extends Activity {
                 Const.company_id= obj.getJSONObject("data").getJSONArray("users").getJSONObject(0).getJSONObject("company").getString("id");
                 Const.company_name= obj.getJSONObject("data").getJSONArray("users").getJSONObject(0).getJSONObject("company").getString("name");
                 Const.User_id_no= obj.getJSONObject("data").getJSONArray("users").getJSONObject(0).getString("id");
+
+
+                SharedPreferenceManager.setString(getApplicationContext(), "USER_ID", et_id.getText().toString());
+                SharedPreferenceManager.setString(getApplicationContext(), "USER_PW", et_pw.getText().toString());
 
                 startActivity(new Intent(SigninPage.this, MainActivity.class));
                 ps.flush();

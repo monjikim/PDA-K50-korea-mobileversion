@@ -39,6 +39,13 @@
             android:screenOrientation="nosensor">
         </activity>
 
+        <service
+            android:name=".etc.PlayService"
+            android:enabled="true"
+            android:exported="true" />
+        
+        
+
     </application>
 
 </manifest>

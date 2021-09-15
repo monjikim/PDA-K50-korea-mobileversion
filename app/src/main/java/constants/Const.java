@@ -2,6 +2,7 @@ package constants;
 
 public class Const {
     public static String User_id = "";
+    public static String User_pw = "";
     public static String User_id_no = "";
     public static String ROLE = null;
     public static String Country = "";
