@@ -163,7 +163,7 @@ public class SigninPage extends Activity {
                     SharedPrefManager.getInstance(LoginPage.this).setUserPW(pw);
                     Const.ROLE = final_return_string;*/
                     Const.Country = final_return_string.trim();
-                    startActivity(new Intent(SigninPage.this, MainActivity.class));
+                    startActivity(new Intent(SigninPage.this, SelectionPage.class));
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -335,7 +335,7 @@ public class SigninPage extends Activity {
                 SharedPreferenceManager.setString(getApplicationContext(), "USER_ID", et_id.getText().toString());
                 SharedPreferenceManager.setString(getApplicationContext(), "USER_PW", et_pw.getText().toString());
 
-                startActivity(new Intent(SigninPage.this, MainActivity.class));
+                startActivity(new Intent(SigninPage.this, SelectionPage.class));
                 ps.flush();
                 ps.close();
 

@@ -35,6 +35,14 @@
             android:screenOrientation="nosensor">
         </activity>
         <activity
+            android:name=".SelectionPage"
+            android:screenOrientation="nosensor">
+        </activity>
+        <activity
+            android:name=".Export_national"
+            android:screenOrientation="nosensor">
+        </activity>
+        <activity
             android:name=".TestActivity"
             android:screenOrientation="nosensor">
         </activity>

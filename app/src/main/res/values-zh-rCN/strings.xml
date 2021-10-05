@@ -17,6 +17,7 @@
     <string name="DIA_CHECK">Confirm</string>
 
     <string name="but_touch">按压</string>
+    <string name="export_rsb">출고(국내)</string>
 
         <!-- exit -->
          <string name="key_test_back_title">提示</string>

@@ -12,6 +12,7 @@
     <string name="btn_send">완료 및\n전송</string>
     <string name="dialog_title">Content</string>
     <string name="spinner">Scan key choose</string>
+    <string name="export_rsb">출고(국내)</string>
     
     <string name="DEV_OPEN_ERR">Device open failed！Software will quit！</string>
     <string name="DIA_ALERT">Warning！</string>

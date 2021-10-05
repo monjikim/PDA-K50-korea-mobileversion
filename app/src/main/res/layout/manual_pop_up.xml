@@ -1,0 +1,301 @@
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <RelativeLayout
+        android:id="@+id/rlPopupManual"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_marginTop="0dp"
+        android:background="#99000000"
+        android:visibility="gone">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/btnPressed1"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentBottom="true"
+                android:background="@android:color/transparent"
+                android:text="" />
+        </RelativeLayout>
+        <RelativeLayout
+            android:id="@+id/rlPopupArea"
+            android:layout_width="300dp"
+            android:layout_height="500dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:layout_marginTop="0dp"
+            android:background="#99000000"
+            android:visibility="visible">
+
+            <RelativeLayout
+                android:id="@+id/rlPopupTopArea"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginLeft="0dp"
+                android:layout_marginTop="0dp"
+                android:background="#222222">
+
+                <RelativeLayout
+                    android:id="@+id/rlTitleArea"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="0dp"
+                    android:layout_marginTop="0dp">
+
+                    <TextView
+                        android:id="@+id/tvPopupTit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        android:gravity="center_horizontal"
+                        android:text="Add Serial No."
+                        android:textColor="#ffffff"
+                        android:textSize="30sp" />
+                </RelativeLayout>
+
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/rlPopupContentArea"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/rlPopupTopArea"
+                android:layout_marginLeft="0dp"
+                android:layout_marginTop="0dp">
+
+                <RelativeLayout
+                    android:id="@+id/rlPopupContentLeftArea"
+                    android:layout_width="match_parent"
+                    android:layout_height="420dp"
+                    android:layout_marginLeft="0dp"
+                    android:layout_marginTop="0dp"
+                    android:background="#e8e8e8">
+                    <LinearLayout
+                        android:layout_alignParentStart="true"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp">
+                        <TextView
+                            android:textColor="@color/black"
+                            android:layout_marginLeft="20dp"
+                            android:textSize="20sp"
+                            android:layout_marginTop="5px"
+                            android:text="Serial No. : "
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                        <EditText
+                            android:textColor="@color/black"
+                            android:textColorHint="#929292"
+                            android:gravity="center"
+                            android:inputType="number"
+                            android:maxLength="6"
+                            android:singleLine="true"
+                            android:textSize="20sp"
+                            android:id="@+id/Serial_no"
+                            android:layout_width="150dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"
+                            android:hint="ex : 000000" />
+                        <TextView
+                            android:visibility="gone"
+                            android:layout_marginTop="5dp"
+                            android:textSize="20sp"
+                            android:text="."
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                        <EditText
+                            android:visibility="gone"
+                            android:inputType="number"
+                            android:maxLength="3"
+                            android:singleLine="true"
+                            android:imeOptions="actionNext"
+                            android:textSize="15dp"
+                            android:id="@+id/ipAddress_et2"
+                            android:nextFocusDown="@id/ipAddress_et3"
+                            android:layout_width="60dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"
+                            android:hint="" />
+                        <TextView
+                            android:visibility="gone"
+                            android:layout_marginTop="5dp"
+                            android:textSize="20sp"
+                            android:text="."
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                        <EditText
+                            android:visibility="gone"
+                            android:inputType="number"
+                            android:maxLength="3"
+                            android:singleLine="true"
+                            android:imeOptions="actionNext"
+                            android:textSize="15dp"
+                            android:id="@+id/ipAddress_et3"
+                            android:nextFocusDown="@id/ipAddress_et4"
+                            android:layout_width="60dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"
+                            android:hint="" />
+                        <TextView
+                            android:visibility="gone"
+                            android:layout_marginTop="5dp"
+                            android:textSize="20sp"
+                            android:text="."
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                        <EditText
+                            android:visibility="gone"
+                            android:inputType="number"
+                            android:maxLength="3"
+                            android:singleLine="true"
+                            android:imeOptions="actionNext"
+                            android:textSize="15dp"
+                            android:id="@+id/ipAddress_et4"
+                            android:layout_width="60dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"
+                            android:hint="" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/ipaddressll"
+                        android:orientation="horizontal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="50dp"
+                        >
+                        <TextView
+                            android:textColor="@color/black"
+                            android:layout_marginTop="5dp"
+                            android:textSize="20sp"
+                            android:text="Type : "
+                            android:layout_marginLeft="20dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                        <LinearLayout
+                            android:orientation="vertical"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+                                <ScrollView
+                                    android:id="@+id/pop_up_scroll"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content">
+                                    <RadioGroup
+                                        android:id="@+id/Radio_type"
+                                        android:orientation="vertical"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content">
+                                        <RadioButton
+                                            android:buttonTint="@color/black"
+                                            android:textColor="@color/black"
+                                            android:checked="true"
+                                            android:id="@+id/cpil"
+                                            android:textSize="30sp"
+                                            android:text="CP-L12"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content" />
+                                        <RadioButton
+                                            android:buttonTint="@color/black"
+                                            android:textColor="@color/black"
+                                            android:id="@+id/cp_l"
+                                            android:textSize="30sp"
+                                            android:text="CP-L11"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content" />
+                                    </RadioGroup>
+                                </ScrollView>
+                            </LinearLayout>
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+                                <RadioGroup
+                                    android:visibility="gone"
+                                    android:id="@+id/Radio_type2"
+                                    android:orientation="vertical"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content">
+                                    <RadioButton
+                                        android:buttonTint="@color/black"
+                                        android:textColor="@color/black"
+                                        android:id="@+id/cp_m"
+                                        android:textSize="30sp"
+                                        android:text="CP-M11"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content" />
+                                    <RadioButton
+                                        android:buttonTint="@color/black"
+                                        android:textColor="@color/black"
+                                        android:id="@+id/cp_s"
+                                        android:textSize="30sp"
+                                        android:text="CP-S11"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content" />
+                                </RadioGroup>
+                            </LinearLayout>
+                        </LinearLayout>
+
+
+                    </LinearLayout>
+
+
+
+                </RelativeLayout>
+                <RelativeLayout
+                    android:background="#222222"
+                    android:id="@+id/rlPopupContentBottomArea"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_below="@+id/rlPopupContentLeftArea"
+                    android:layout_marginLeft="0dp"
+                    android:layout_marginTop="0dp">
+
+                    <Button
+                        android:id="@+id/btn_add_serial"
+                        android:layout_marginLeft="30dp"
+                        android:layout_width="120dp"
+                        android:layout_height="30dp"
+                        android:background="#000000"
+                        android:text="ADD"
+                        android:textAlignment="center"
+                        android:gravity="center"
+                        android:layout_centerVertical="true"
+                        android:textColor="#ffffff"
+                        android:textSize="22sp" />
+
+                    <Button
+                        android:id="@+id/btn_add_cancel"
+                        android:layout_width="120dp"
+                        android:layout_height="30dp"
+                        android:layout_toRightOf="@+id/btn_add_serial"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="10dp"
+                        android:background="#000000"
+                        android:text="Cancel"
+                        android:textAlignment="center"
+                        android:gravity="center"
+                        android:textColor="#ffffff"
+                        android:textSize="22sp" />
+
+                </RelativeLayout>
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+
+    </RelativeLayout>
+</merge>

@@ -1,0 +1,893 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/mylayout"
+	android:orientation="vertical"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent">
+
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:background="#e8e8e8"
+		android:orientation="vertical">
+		<TextView
+			android:id="@+id/menu_title"
+			android:paddingLeft="20dp"
+			android:textColor="@color/black"
+			android:background="#FFFFFF"
+			android:text=""
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content" />
+
+		<TextView
+
+			android:layout_width="match_parent"
+
+			android:layout_height="wrap_content"
+			android:text="Scanner Intent"
+			android:textSize="20dp"
+			android:visibility="gone" />
+
+		<TextView
+
+
+			android:layout_width="wrap_content"
+
+
+			android:layout_height="wrap_content"
+			android:text=" "
+			android:textAppearance="?android:attr/textAppearanceLarge"
+			android:visibility="gone" />
+
+		<TextView
+
+
+			android:layout_width="wrap_content"
+
+
+			android:layout_height="wrap_content"
+			android:text=" "
+			android:textAppearance="?android:attr/textAppearanceLarge"
+			android:visibility="gone" />
+
+		<TextView
+
+			android:layout_width="match_parent"
+
+			android:layout_height="wrap_content"
+			android:text="Settings"
+			android:textSize="20dp"
+			android:visibility="gone" />
+
+		<TextView
+
+
+			android:layout_width="wrap_content"
+
+
+			android:layout_height="wrap_content"
+			android:text="  Sound"
+			android:textSize="15dp"
+			android:visibility="gone" />
+
+		<LinearLayout
+
+
+			android:layout_width="fill_parent"
+
+			android:layout_height="wrap_content"
+
+			android:focusable="true"
+			android:focusableInTouchMode="true"
+
+			android:orientation="horizontal"
+			android:visibility="gone">
+
+			<RadioGroup
+
+				android:id="@+id/radio_sound"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:orientation="horizontal">
+
+
+				<RadioButton
+					android:id="@+id/sound_none"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="None" />
+
+				<RadioButton
+					android:id="@+id/sound_beep"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="Beep" />
+
+				<RadioButton
+					android:id="@+id/sound_dingdong"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="Ding-Dong" />
+			</RadioGroup>
+
+		</LinearLayout>
+
+		<TextView
+
+
+			android:layout_width="wrap_content"
+
+
+			android:layout_height="wrap_content"
+			android:text="  Read Mode"
+			android:textSize="15dp"
+			android:visibility="gone" />
+
+		<LinearLayout
+
+
+			android:layout_width="fill_parent"
+
+
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+			android:visibility="gone">
+
+			<RadioGroup
+				android:id="@+id/radio_read_mode"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:orientation="horizontal">
+
+
+				<RadioButton
+
+
+					android:id="@+id/read_mode_async"
+
+
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="Async"
+					android:visibility="gone" />
+
+				<RadioButton
+					android:id="@+id/read_mode_sync"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="Sync" />
+
+				<RadioButton
+					android:id="@+id/read_mode_continue"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="continue" />
+			</RadioGroup>
+
+		</LinearLayout>
+
+		<TextView
+
+
+			android:layout_width="wrap_content"
+
+
+			android:layout_height="wrap_content"
+			android:text="  Output Mode"
+			android:textSize="15dp"
+			android:visibility="gone" />
+
+		<LinearLayout
+
+
+			android:layout_width="fill_parent"
+
+
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+			android:visibility="gone">
+
+			<RadioGroup
+				android:id="@+id/radio_output_mode"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:orientation="horizontal">
+
+
+				<RadioButton
+					android:id="@+id/output_mode_copyandpaste"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="Copy Paste" />
+
+				<RadioButton
+					android:id="@+id/output_mode_key"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="Key" />
+
+				<RadioButton
+					android:id="@+id/output_mode_none"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="None" />
+			</RadioGroup>
+
+		</LinearLayout>
+
+
+		<TextView
+
+
+			android:layout_width="wrap_content"
+
+
+			android:layout_height="wrap_content"
+			android:text="  End Character"
+			android:textSize="15dp"
+			android:visibility="gone" />
+
+		<RadioGroup
+
+
+			android:id="@+id/radio_end_mode"
+
+
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:orientation="vertical"
+			android:visibility="gone">
+
+			<RadioButton
+				android:id="@+id/end_enter"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="Enter" />
+
+			<RadioButton
+				android:id="@+id/end_space"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="Space" />
+
+			<RadioButton
+				android:id="@+id/end_tab"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="Tab" />
+
+			<RadioButton
+				android:id="@+id/end_none"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="None" />
+
+			<RadioButton
+				android:id="@+id/end_key_enter"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="Key enter" />
+
+			<RadioButton
+				android:id="@+id/end_key_space"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="Key space" />
+
+			<RadioButton
+				android:id="@+id/end_key_tab"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="Key tab" />
+		</RadioGroup>
+
+
+		<LinearLayout
+
+
+			android:layout_width="fill_parent"
+
+
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+			android:visibility="gone">
+
+			<TextView
+				android:id="@+id/textView_prefix"
+				android:layout_width="100dp"
+				android:layout_height="wrap_content"
+				android:text="Prefix"
+				android:textSize="15dp" />
+
+			<TextView
+				android:layout_width="100dp"
+				android:layout_height="wrap_content"
+				android:layout_toRightOf="@+id/textView_postfix"
+				android:text="Postfix"
+				android:textSize="15dp" />
+
+		</LinearLayout>
+
+		<LinearLayout
+
+
+			android:layout_width="fill_parent"
+
+
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+			android:visibility="gone">
+
+			<Button
+				android:id="@+id/button_disable_all"
+				android:layout_width="150dp"
+				android:layout_height="wrap_content"
+				android:text="disable all" />
+
+			<Button
+				android:id="@+id/button_enable_all"
+				android:layout_width="150dp"
+				android:layout_height="wrap_content"
+				android:text="enable all" />
+
+		</LinearLayout>
+
+		<LinearLayout
+			android:orientation="vertical"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content">
+
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="horizontal">
+
+				<LinearLayout
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:orientation="vertical">
+
+					<LinearLayout
+						android:visibility="gone"
+						android:layout_width="fill_parent"
+						android:layout_height="wrap_content"
+						android:background="#e8e8e8"
+						android:orientation="horizontal"
+						android:weightSum="1">
+
+						<!--vibration-->
+
+
+						<CheckBox
+
+							android:id="@+id/vibration_mode3"
+
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:text="Vibration"
+							android:visibility="gone" />
+
+						<LinearLayout
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:focusable="true"
+							android:focusableInTouchMode="true">
+
+						</LinearLayout>
+
+						<CheckBox
+							android:id="@+id/read_mode3"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:text="Continuous  Scan"
+							android:visibility="gone" />
+
+						<CheckBox
+							android:id="@+id/sound_mode3"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:text="Sound"
+							android:visibility="gone" />
+
+
+						<CheckBox
+
+
+							android:id="@+id/key_enable_mode3"
+
+
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:text="Key Enable"
+							android:visibility="gone" />
+					</LinearLayout>
+
+					<LinearLayout
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:layout_marginTop="5dp"
+						android:background="#e8e8e8"
+						android:orientation="horizontal"
+						android:weightSum="1">
+
+						<RelativeLayout
+							android:layout_width="match_parent"
+							android:layout_height="match_parent"
+							android:layout_marginTop="5dp">
+
+							<Button
+								android:background="@drawable/button_selector3"
+								android:id="@+id/clear_button"
+								android:layout_width="93dp"
+								android:layout_height="53dp"
+								android:layout_centerVertical="true"
+								android:layout_marginLeft="20dp"
+								android:text="RESET"
+								android:textColor="#ffffff"
+								android:textSize="22dp" />
+							<Button
+								android:background="@drawable/button_selector1"
+								android:id="@+id/btn_go_to_menu"
+								android:layout_width="93dp"
+								android:layout_height="53dp"
+								android:layout_centerVertical="true"
+								android:layout_marginLeft="20dp"
+								android:layout_toRightOf="@+id/clear_button"
+								android:text="HOME"
+								android:textColor="#ffffff"
+								android:textSize="25dp" />
+							<Button
+								android:background="@drawable/button_selector2"
+								android:id="@+id/send_to_server"
+								android:layout_width="93dp"
+								android:layout_height="53dp"
+								android:layout_centerVertical="true"
+								android:layout_toRightOf="@+id/btn_go_to_menu"
+								android:layout_marginLeft="20dp"
+								android:text="SEND"
+								android:textColor="#ffffff"
+								android:textSize="25dp" />
+
+							<TextView
+								android:visibility="gone"
+								android:id="@+id/textviewScannumber"
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:layout_centerVertical="true"
+								android:layout_marginLeft="7dp"
+								android:layout_toRightOf="@+id/clear_button"
+								android:text="스캔갯수"
+								android:textSize="10dp" />
+							<Spinner
+								android:visibility="gone"
+								android:background="#D5D8DC"
+								android:id="@+id/target_numb"
+								android:layout_width="44dp"
+								android:layout_height="26dp"
+								android:layout_marginLeft="4dp"
+								android:layout_toRightOf="@+id/textviewScannumber"
+								android:dropDownWidth="43dp"
+								android:inputType="number"
+								android:paddingRight="4dp" />
+							<TextView
+								android:textAlignment="gravity"
+								android:gravity="right"
+								android:visibility="gone"
+								android:id="@+id/invisibleText"
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content" />
+
+							<!--팝업으로 하는 방법
+                            <Button
+                                android:background="#D5D8DC"
+                                android:id="@+id/target_numb"
+                                android:layout_width="44dp"
+                                android:layout_height="26dp"
+                                android:layout_marginLeft="4dp"
+                                android:layout_toRightOf="@+id/textviewScannumber"
+                                android:gravity="right"
+                                android:hint="0"
+                                android:maxLength="2"
+                                android:maxLines="1"
+                                android:inputType="number"
+                                android:paddingRight="4dp" />-->
+                        </RelativeLayout>
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_marginTop="8dp"
+                        android:orientation="vertical"
+						android:layout_marginRight="20dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <LinearLayout
+                            android:id="@+id/llsame_country"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="#e8e8e8"
+                            android:visibility="visible">
+                            <Button
+                                android:id="@+id/manual_input_data2"
+                                android:layout_width="150dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="20dp"
+                                android:text="Manual"
+                                android:textSize="20sp" />
+                        </LinearLayout>
+						<LinearLayout
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content">
+							<TextView
+								android:textColor="@color/black"
+								android:id="@+id/textviewScannumber3"
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:layout_centerVertical="true"
+								android:layout_marginLeft="20dp"
+								android:text="To : "
+								android:textSize="25sp" />
+
+							<Spinner
+								android:id="@+id/target_numb3"
+								android:layout_width="match_parent"
+								android:layout_height="match_parent"
+								android:background="#D5D8DC"
+								android:clickable="false"
+								android:dropDownWidth="match_parent"
+								android:popupBackground="#D5D8DC" />
+						</LinearLayout>
+                        <LinearLayout
+                            android:id="@+id/lldiff_country"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="#e8e8e8"
+                            android:visibility="gone">
+
+							<!--vibration-->
+
+
+							<CheckBox
+
+								android:id="@+id/vibration_mode"
+
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:text="Vibration"
+								android:visibility="gone" />
+
+							<LinearLayout
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:focusable="true"
+								android:focusableInTouchMode="true">
+
+							</LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content">
+                                <TextView
+                                    android:textColor="@color/black"
+                                    android:id="@+id/autoScan"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_vertical"
+                                    android:layout_marginLeft="20dp"
+                                    android:layout_marginTop="2dp"
+                                    android:padding="4dp"
+                                    android:text="CT No. : "
+                                    android:textSize="20sp" />
+
+                                <EditText
+                                    android:textColor="@color/black"
+                                    android:id="@+id/container_no"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:width="128dp"
+                                    android:inputType="textCapCharacters"
+                                    android:maxLength="11"
+                                    android:singleLine="true"
+                                    android:textSize="17sp" />
+                            </LinearLayout>
+
+							<CheckBox
+								android:id="@+id/read_mode"
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:text="Continuous  Scan"
+								android:visibility="gone" />
+
+
+							<CheckBox
+								android:id="@+id/sound_mode"
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:text="Sound"
+								android:visibility="gone" />
+
+
+							<CheckBox
+
+
+								android:id="@+id/key_enable_mode"
+
+
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:text="Key Enable"
+								android:visibility="gone" />
+
+                            <Button
+                                android:layout_marginLeft="5dp"
+                                android:id="@+id/manual_input_data"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Manual"
+                                android:textSize="20sp" />
+
+
+                        </LinearLayout>
+                        <LinearLayout
+                            android:id="@+id/lldiff_country2"
+                            android:layout_marginRight="20dp"
+                            android:visibility="gone"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+                            <TextView
+                                android:textColor="@color/black"
+                                android:id="@+id/tv_seal"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                android:layout_marginLeft="20dp"
+                                android:text="Seal : "
+                                android:textSize="20sp" />
+
+                            <EditText
+                                android:nextFocusForward="@id/textviewScannumber2"
+                                android:textColor="@color/black"
+                                android:id="@+id/et_seal_no"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="textCapCharacters"
+                                android:maxLength="11"
+                                android:singleLine="true"
+                                android:textSize="17sp" />
+
+						</LinearLayout>
+						<LinearLayout
+							android:id="@+id/lldiff_country3"
+							android:layout_marginRight="20dp"
+							android:visibility="gone"
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:orientation="horizontal">
+							<TextView
+								android:textColor="@color/black"
+								android:id="@+id/textviewScannumber2"
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:layout_centerVertical="true"
+								android:layout_marginLeft="20dp"
+								android:text="To : "
+								android:textSize="20sp" />
+							<Spinner
+								android:clickable="false"
+								android:background="#D5D8DC"
+								android:popupBackground="#D5D8DC"
+								android:id="@+id/target_numb2"
+								android:layout_width="match_parent"
+								android:layout_height="match_parent"
+								android:layout_marginLeft="4dp"
+								android:layout_toRightOf="@+id/textviewScannumber2"
+								android:dropDownWidth="match_parent"
+								android:paddingRight="4dp" />
+
+						</LinearLayout>
+					</LinearLayout>
+				</LinearLayout>
+
+				<LinearLayout
+					android:visibility="gone"
+					android:layout_width="match_parent"
+					android:layout_height="match_parent"
+					android:layout_marginLeft="9dp"
+					android:background="#e8e8e8"
+					android:orientation="vertical">
+
+					<LinearLayout
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_marginBottom="7dp"
+						android:layout_marginTop="1dp"
+						android:orientation="horizontal">
+
+						<Button
+							android:layout_width="wrap_content"
+							android:layout_height="30dp"
+							android:text="기타"
+							android:textSize="12dp" />
+
+					</LinearLayout>
+
+					<LinearLayout
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+
+						android:layout_marginBottom="5dp"
+						android:orientation="horizontal">
+
+						<Button
+							android:layout_width="wrap_content"
+							android:layout_height="30dp"
+							android:layout_weight="1"
+							android:text=">"
+							android:textSize="10dp" />
+
+						<Button
+							android:layout_width="wrap_content"
+							android:layout_height="30dp"
+							android:layout_weight="1"
+							android:text="ㅁ"
+							android:textSize="10dp" />
+
+					</LinearLayout>
+
+
+
+				</LinearLayout>
+
+				<LinearLayout
+					android:visibility="gone"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_marginLeft="9dp"
+					android:orientation="vertical">
+
+					<CheckBox
+						android:id="@+id/checkBox"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:layout_gravity="end"
+						android:layout_weight="1"
+						android:scaleX="1.3"
+						android:scaleY="1.3"
+						android:text="S/M"
+						android:textSize="7dp" />
+
+					<CheckBox
+						android:layout_width="65dp"
+						android:layout_height="wrap_content"
+						android:layout_marginTop="5dp"
+						android:layout_weight="1"
+						android:scaleX="1.3"
+						android:scaleY="1.3"
+						android:text="CAS"
+						android:textSize="7dp" />
+
+				</LinearLayout>
+
+			</LinearLayout>
+
+		</LinearLayout>
+
+		<ScrollView
+			android:id="@+id/scroll"
+			android:layout_width="match_parent"
+			android:layout_height="339dp"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="10dp"
+			android:layout_marginRight="20dp"
+			android:background="@drawable/back">
+			<!--330임-->
+			<!--360임-->
+
+
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="vertical">
+
+				<LinearLayout
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:background="@drawable/back"
+					android:orientation="horizontal">
+
+					<TextView
+						android:layout_width="wrap_content"
+						android:layout_height="match_parent"
+						android:layout_gravity="center"
+						android:layout_weight="3"
+						android:background="@drawable/back"
+						android:gravity="center"
+						android:text="Export"
+						android:textColor="@color/black"
+						android:textSize="30sp" />
+
+					<TextView
+						android:id="@+id/tv_scan_no"
+						android:layout_width="wrap_content"
+						android:layout_height="match_parent"
+						android:layout_gravity="center"
+						android:layout_marginTop="10dp"
+						android:layout_marginBottom="10dp"
+						android:layout_weight="1"
+						android:gravity="center"
+						android:text="888"
+						android:textColor="@color/black"
+						android:textSize="30sp" />
+				</LinearLayout>
+
+				<TextView
+					android:id="@+id/scanresult"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:gravity="center"
+					android:textColor="@color/black"
+					android:textSize="15sp" />
+			</LinearLayout>
+		</ScrollView>
+
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="10dp"
+			android:background="#e8e8e8"
+			android:orientation="horizontal">
+
+			<Button
+				android:background="@drawable/button_selector1"
+				android:id="@+id/btn_start_scan"
+				android:layout_width="match_parent"
+				android:layout_height="53dp"
+				android:layout_centerVertical="true"
+				android:layout_marginLeft="20dp"
+				android:layout_marginRight="10dp"
+				android:layout_toRightOf="@+id/clear_button"
+				android:text="Scan Start"
+				android:layout_weight="1"
+				android:textColor="#ffffff"
+				android:textSize="20dp" />
+			<Button
+				android:background="@drawable/button_selector2"
+				android:id="@+id/btn_stop_scan"
+				android:layout_width="match_parent"
+				android:layout_height="53dp"
+				android:layout_centerVertical="true"
+				android:layout_marginLeft="10dp"
+				android:layout_marginRight="20dp"
+				android:layout_weight="1"
+				android:layout_toRightOf="@+id/clear_button"
+				android:text="Scan Stop"
+				android:textColor="#ffffff"
+				android:textSize="20dp" />
+
+		</LinearLayout>
+
+		<RelativeLayout
+			android:gravity="center|bottom"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent">
+
+			<ImageView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+
+				android:layout_centerHorizontal="true"
+				android:background="@drawable/nrs_logo" />
+		</RelativeLayout>
+	</LinearLayout>
+	<!--<include-->
+	<!--android:layout_width="match_parent"-->
+	<!--android:layout_height="match_parent"-->
+	<!--layout="@layout/setting_pop_up"/>-->
+	<include
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		layout="@layout/manual_pop_up"/>
+</RelativeLayout>
+
