@@ -68,7 +68,6 @@ public class Export_national extends AppCompatActivity implements ZXingScannerVi
     //sw value
     String user_id = Const.User_id;
     //String user_pw = SharedPrefManager.getInstance(this).getUserPW();
-    String const_ip = "www.npc-rental.com:7778";
     PDAExportThread thread = new PDAExportThread("");
     Context mContext;
     ArrayList<Object> arr = new ArrayList<Object>();
@@ -84,7 +83,6 @@ public class Export_national extends AppCompatActivity implements ZXingScannerVi
     boolean serial_check = false;
     String error_result = "";
     String export_company = "";
-    ArrayList serial_array;
 
     TextView tv_date,tv_count;
     Spinner target_numb2;
@@ -137,20 +135,21 @@ public class Export_national extends AppCompatActivity implements ZXingScannerVi
             @Override
             public void onClick(View v) {
                 if(scancount == 0){
+
                 }
                 else{
                     AlertDialog.Builder alert_confirm = new AlertDialog.Builder(Export_national.this);
-                    alert_confirm.setMessage("RESET?").setCancelable(false).setPositiveButton("Confirm",
+                    alert_confirm.setMessage("초기화 합니까?").setCancelable(false).setPositiveButton("확인",
                             new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     Toast.makeText(mContext, "초기화 하였습니다", Toast.LENGTH_SHORT).show();
                                     mReception.setText(""); //清屏
-                                    serial_array.clear();
+                                    arr.clear();
                                     scancount=0;
                                     tv_count.setText(scancount+"");
                                 }
-                            }).setNegativeButton("Cancel",
+                            }).setNegativeButton("취소",
                             new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
@@ -167,13 +166,13 @@ public class Export_national extends AppCompatActivity implements ZXingScannerVi
         button_undo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(serial_array.size() <= 0){
+                if(arr.size() <= 0){
                     Toast.makeText(mContext, "작업 이후에 선택해주세요.", Toast.LENGTH_SHORT).show();
                 }
                 else{
-                    serial_array.remove(serial_array.size()-1);
+                    arr.remove(arr.size()-1);
                     Toast.makeText(mContext, "마지막 작업이 삭제 되었습니다.", Toast.LENGTH_SHORT).show();
-                    mReception.setText(mReception.getText().subSequence(0,(mReception.length()-30)-(scancount+"").length()));
+                    mReception.setText(mReception.getText().subSequence(0,(mReception.length()-14)));
                     scancount-=1;
                     tv_count.setText(scancount+"");
                 }
@@ -182,31 +181,40 @@ public class Export_national extends AppCompatActivity implements ZXingScannerVi
         button_send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder alert_confirm = new AlertDialog.Builder(Export_national.this);
-                alert_confirm.setMessage("Send to Server?").setCancelable(false).setPositiveButton("confirm",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                button_send.setEnabled(false);
-                                try {
-                                    thread.start();
-                                } catch (Exception e) {
-                                    thread = null;
-                                    thread = new PDAExportThread("");
-                                    thread.start();
+                //array count check
+                if(arr.size() < 1){
+                    Toast.makeText(mContext, "스캔을 먼저 진행해주세요.", Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    AlertDialog.Builder alert_confirm = new AlertDialog.Builder(Export_national.this);
+                    alert_confirm.setMessage("서버로 전송합니까?").setCancelable(false).setPositiveButton("확인",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    button_send.setEnabled(false);
+                                    for (int i = 0; i < arr.size(); i++) {
+                                        Bufarr.add(arr.get(i));
+                                    }
+                                    try {
+                                        thread.start();
+                                    } catch (Exception e) {
+                                        thread = null;
+                                        thread = new PDAExportThread("");
+                                        thread.start();
+                                    }
                                 }
-                            }
 
-                        }).setNegativeButton("Cancel",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                // 'No'
-                                return;
-                            }
-                        });
-                AlertDialog alert = alert_confirm.create();
-                alert.show();
+                            }).setNegativeButton("취소",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // 'No'
+                                    return;
+                                }
+                            });
+                    AlertDialog alert = alert_confirm.create();
+                    alert.show();
+                }
             }
         });
 
@@ -254,7 +262,7 @@ public class Export_national extends AppCompatActivity implements ZXingScannerVi
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 SharedPrefManager.getInstance(Export_national.this).setNationalexport_spinner(String.valueOf(i));
-                Const.ExportNationalSpinner = String.valueOf(i);
+                Const.ExportSpinner = String.valueOf(i);
                 target_numb2.setSelection(i);
             }
 
@@ -287,14 +295,14 @@ public class Export_national extends AppCompatActivity implements ZXingScannerVi
                             serial_check = true;
                         }
                     }
-                    int textadding = 0;
                     if (!serial_check) {
                         arr.add(add_serial);
-                        textadding = arr.size() - 1;
-                        mReception.append("" + arr.get(textadding).toString() + "   >>   [ ");
-                        mReception.append(String.format("%3d", textadding + 1));
-                        mReception.append(" ] Scanned\n");
-                        tv_count.setText(""+(textadding+1));
+                        scancount+=1;
+                        mReception.append(""+add_serial+"\n");
+//                        mReception.append("" + arr.get(textadding).toString() + "   >>   [ ");
+//                        mReception.append(String.format("%3d", textadding + 1));
+//                        mReception.append(" ] Scanned\n");
+                        tv_count.setText(""+(scancount));
                         viewManualPopup();
                     } else {
                         Toast.makeText(mContext, "이미 입력된 Serial 번호입니다.", Toast.LENGTH_SHORT).show();
@@ -369,23 +377,21 @@ public class Export_national extends AppCompatActivity implements ZXingScannerVi
         mReception = (EditText)findViewById(R.id.mReception);
         Serial_no = (EditText)findViewById(R.id.Serial_no);
         rlPopupManual = (RelativeLayout)findViewById(R.id.rlPopupManual);
-        serial_array = new ArrayList();
 
         ArrayList<String> temp_dest = new ArrayList<String>();
         Iterator it;
-//        it = Const.export_companies.entrySet().iterator();
-//        while(it.hasNext()){
-//            Map.Entry pair = (Map.Entry)it.next();
-//            if(pair.getValue().toString().split("@")[1].equals(Const.User_country_id)){
-//                temp_dest.add(pair.getKey().toString());
-//            }
-//        }
-        temp_dest.add("abc");
+        it = Const.export_companies.entrySet().iterator();
+        while(it.hasNext()){
+            Map.Entry pair = (Map.Entry)it.next();
+            if(pair.getValue().toString().split("@")[1].equals("1")){
+                temp_dest.add(pair.getKey().toString());
+            }
+        }
         String[] destinations = new String[temp_dest.size()];
         temp_dest.toArray(destinations);
 
         String compareSpinner;
-        if(Const.ExportNationalSpinner == null){
+        if(Const.ExportSpinner == null){
             compareSpinner = "0";
         }else{
             compareSpinner = Const.ExportSpinner;
@@ -415,16 +421,17 @@ public class Export_national extends AppCompatActivity implements ZXingScannerVi
                 }
         );
         for(int i = 0; i < Const.all_pallet_types.size(); i++){
-            RadioButton rb = new RadioButton(mContext);
-            rb.setTextSize(30);
-            rb.setText(Const.all_pallet_types.get(i)+"");
-            rb.setTag(""+(i+1));
-            rb.setTextColor(Color.BLACK);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                rb.setButtonTintList(colorStateList);
+            if(Const.all_pallet_types.get(i).toString().substring(0,3).equals("CP-")){
+                RadioButton rb = new RadioButton(mContext);
+                rb.setTextSize(30);
+                rb.setText(Const.all_pallet_types.get(i)+"");
+                rb.setTag(""+(i+1));
+                rb.setTextColor(Color.BLACK);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    rb.setButtonTintList(colorStateList);
+                }
+                Radio_type.addView(rb);
             }
-            Log.e(TAG,">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> add Brand Name");
-            Radio_type.addView(rb);
         }
         tv_count.setText("0");
     }
@@ -444,22 +451,26 @@ public class Export_national extends AppCompatActivity implements ZXingScannerVi
     public void handleResult(Result result) {
 
         String data = result.getText().trim();
-        for(int i=0; i<serial_array.size();i++){
-            if(serial_array.get(i).equals(data.trim())){
-                serial_check = true;
+        if(data.length() == 13){
+            for(int i=0; i<arr.size();i++){
+                if(arr.get(i).equals(data.trim())){
+                    serial_check = true;
+                }
+            }
+            if(serial_check){
+                serial_check = false;
+                Toast.makeText(mContext, "이미 등록된 시리얼 번호 입니다.", Toast.LENGTH_SHORT).show();
+            }else{
+                scancount+=1;
+                tv_count.setText(scancount+"");
+                arr.add(data);
+
+                mReception.append(data+"\n");
             }
         }
-        if(serial_check){
-            serial_check = false;
-            Toast.makeText(mContext, "이미 등록된 시리얼 번호 입니다.", Toast.LENGTH_SHORT).show();
-        }else{
-            scancount+=1;
-            tv_count.setText(scancount+"");
-            serial_array.add(data);
-
-            mReception.append(scancount+"\n");
+        else{
+            Toast.makeText(mContext, "잘못된 시리얼 번호 입니다.", Toast.LENGTH_SHORT).show();
         }
-
         barcode_scanner.setResultHandler(Export_national.this);
         barcode_scanner.startCamera();
     }
@@ -480,7 +491,7 @@ public class Export_national extends AppCompatActivity implements ZXingScannerVi
                 String error_message;
 
                 PrintStream ps = null;
-                URL url = new URL("http://www.npc-rental.com:1337/graphql");       // URL 설정
+                URL url = new URL("http://www.npc-iot.com:1337/graphql");       // URL 설정
                 URLConnection con = url.openConnection();   // 접속
                 con.setRequestProperty("Authorization","Bearer "+ Const.Tokeninfo);
                 con.setRequestProperty("Method","POST");
@@ -518,8 +529,8 @@ public class Export_national extends AppCompatActivity implements ZXingScannerVi
                         "    input:{\n" +
                         "     data:{\n" +
                         "      menu:1379\n" + //pda export
-                        "      prv_company: "+ Const.Warehouse_id+"\n" +
-                        "      cur_company: "+ Const.Warehouse_id+"\n" +
+                        "      prv_company: "+ Const.company_id+"\n" +
+                        "      cur_company: "+ Const.company_id+"\n" +
                         "      nxt_company: "+export_company+"\n" +
                         "      rsb_no : \""+serial_temp+"\"\n" +
                         "      container_no : \"\"\n" +
@@ -571,10 +582,7 @@ public class Export_national extends AppCompatActivity implements ZXingScannerVi
                 }catch (Exception e){
                     error_message = "none";
                 }
-                Log.e("ERROR","/msg ----------//////////////////////////////////////////"+error_message);
-
                 total = null;
-
                 in.close();
                 r.close();
 
@@ -586,10 +594,11 @@ public class Export_national extends AppCompatActivity implements ZXingScannerVi
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            mReception.setText("Do not have authorization.\nPlease contact Manager");
+                            mReception.setText("권한이 없습니다.");
                         }
                     });
-                }else if(!error_message.equals("")){
+                }
+                else if(!error_message.equals("")){
                     String[] split_list = error_message.split("/");
 
                     for(int i=0; i<split_list.length;i++){
@@ -599,22 +608,23 @@ public class Export_national extends AppCompatActivity implements ZXingScannerVi
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                mReception.setText(error_result+" has an error! Please Check");
+                                mReception.setText(error_result+" 번호에 에러가 있습니다 확인해주세요.");
                             }
                         });
                     }else{
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                mReception.setText(error_result+" have an error! Please Check");
+                                mReception.setText(error_result+" 번호에 에러가 있습니다 확인해주세요.");
                             }
                         });
                     }
-                }else{
+                }
+                else{
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(getApplicationContext(), "data has been sent", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext(), "전송 되었습니다.", Toast.LENGTH_LONG).show();
                             mReception.setText("");
                         }
                     });
@@ -622,7 +632,9 @@ public class Export_national extends AppCompatActivity implements ZXingScannerVi
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        scancount = 0;
                         tv_count.setText("0");
+                        button_send.setEnabled(true);
                     }
                 });
 

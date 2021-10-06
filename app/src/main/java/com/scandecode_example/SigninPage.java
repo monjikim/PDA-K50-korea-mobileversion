@@ -28,11 +28,20 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import constants.Const;
 
 import static constants.Const.User_id;
 import static constants.Const.User_pw;
+import static constants.Const.all_pallet_types;
 
 public class SigninPage extends Activity {
 
@@ -40,7 +49,7 @@ public class SigninPage extends Activity {
     Button bt_login;
     String token_value;
     String u_id,u_pw;
-    String const_ip = "www.npc-rental.com:7778"; //aws 서버
+    String const_ip = "www.npc-iot.com:7778"; //aws 서버
     //String const_ip = "119.201.111.73:7778"; //영천 서버
     //String const_ip = "124.194.93.51:7778";
 
@@ -209,8 +218,8 @@ public class SigninPage extends Activity {
             try {
 
                 PrintStream ps = null;
-                URL url = new URL("http://www.npc-rental.com:1337/auth/local");       // URL 설정
-                Log.d("sw : ","http://www.npc-rental.com:1337/auth/local");
+                URL url = new URL("http://www.npc-iot.com:1337/auth/local");       // URL 설정
+                Log.d("sw : ","http://www.npc-iot.com:1337/auth/local");
                 URLConnection con = url.openConnection();   // 접속
                 con.setDoOutput(true);
                 ps = new PrintStream(con.getOutputStream());
@@ -303,7 +312,7 @@ public class SigninPage extends Activity {
         public void run() {
             try {
                 PrintStream ps = null;
-                URL url = new URL("http://www.npc-rental.com:1337/graphql");       // URL 설정
+                URL url = new URL("http://www.npc-iot.com:1337/graphql");       // URL 설정
                 URLConnection con = url.openConnection();   // 접속
                 con.setRequestProperty("Authorization","Bearer "+token_value);
                 con.setRequestProperty("Method","POST");
@@ -335,13 +344,164 @@ public class SigninPage extends Activity {
                 SharedPreferenceManager.setString(getApplicationContext(), "USER_ID", et_id.getText().toString());
                 SharedPreferenceManager.setString(getApplicationContext(), "USER_PW", et_pw.getText().toString());
 
-                startActivity(new Intent(SigninPage.this, SelectionPage.class));
+                String query2 = "query {\n" +
+                        "   companies(where: {use_yn:1 type:35}) {\n" +
+                        "    id\n" +
+                        "    name\n" +
+                        "    eng_name\n" +
+                        "    country{\n" +
+                        "      id\n" +
+                        "    }\n" +
+                        "  }\n" +
+                        "}\n";
+                LoginThread2 thread2 = new LoginThread2(query2);
+                try {
+                    thread2.start();
+                } catch (Exception e) {
+                    Log.d("abc", "thread error ///////////////////////////// ");
+                }
+//                startActivity(new Intent(SigninPage.this, SelectionPage.class));
                 ps.flush();
                 ps.close();
 
             } catch (Exception ex) {
                 Toast.makeText(SigninPage.this, "Don't have permission to use this app", Toast.LENGTH_SHORT).show();
                 ex.printStackTrace();
+            }
+        }
+    }
+
+    class LoginThread2 extends Thread {
+        String rfid_tag;
+        public LoginThread2(String rfid) {
+            rfid_tag = rfid;
+        }
+        public void run() {
+            try {
+                PrintStream ps = null;
+                URL url = new URL("http://www.npc-iot.com:1337/graphql");       // URL 설정
+                URLConnection con = url.openConnection();   // 접속
+                con.setRequestProperty("Authorization","Bearer "+token_value);
+                con.setRequestProperty("Method","POST");
+                con.setDoOutput(true);
+                ps = new PrintStream(con.getOutputStream());
+                String buffer = "";
+                buffer += ("query") + ("=") + (rfid_tag);           // 변수 구분은 '&' 사용
+                Log.d("check2",buffer);
+
+                ps.print(buffer);
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                InputStream in = con.getInputStream();
+
+                BufferedReader r = new BufferedReader(new InputStreamReader(in));
+                String return_string = "";
+                StringBuilder total = new StringBuilder();
+                for (String line; (line = r.readLine()) != null; ) {
+                    total.append(line).append('\n');
+                }
+                return_string = total.toString();
+                Log.d("check",return_string);
+
+                JSONObject obj = new JSONObject(return_string);
+
+                int export_company_count = 0;
+                export_company_count = obj.getJSONObject("data").getJSONArray("companies").length();
+                for(int i=0;i<export_company_count;i++){
+                    try{
+                        if(!obj.getJSONObject("data").getJSONArray("companies").getJSONObject(i).equals("null")){
+                            Const.export_companies.put(obj.getJSONObject("data").getJSONArray("companies").getJSONObject(i).getString("name"),
+                                    i+"@"+
+                                            obj.getJSONObject("data").getJSONArray("companies").getJSONObject(i).getJSONObject("country").getString("id")+"@"+
+                                            obj.getJSONObject("data").getJSONArray("companies").getJSONObject(i).getString("id")
+                            );
+                        }
+                    }catch (Exception e){
+
+                    }
+                }
+                Log.e("CHECK:3","export_companies : "+Const.export_companies);
+                String query3 = "query {\n" +
+                        "  rsbtypes(where: { use_yn: 1 }) {\n" +
+                        "    code\n" +
+                        "    id\n" +
+                        "    unit\n" +
+                        "    cunit\n" +
+                        "  }"  +
+                        "}\n";
+                LoginThread3 thread = new LoginThread3(query3);
+                try {
+                    thread.start();
+                } catch (Exception e) {
+                    Log.d("abc", "thread error ///////////////////////////// ");
+                }
+                ps.flush();
+                ps.close();
+
+            } catch (Exception ex) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(SigninPage.this, "Failed to load data, Please Log in again", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        }
+    }
+    class LoginThread3 extends Thread {
+        String rfid_tag;
+        public LoginThread3(String rfid) {
+            rfid_tag = rfid;
+        }
+        public void run() {
+            try {
+                PrintStream ps = null;
+                URL url = new URL("http://www.npc-iot.com:1337/graphql");       // URL 설정
+                URLConnection con = url.openConnection();   // 접속
+                con.setRequestProperty("Authorization","Bearer "+token_value);
+                con.setRequestProperty("Method","POST");
+                con.setDoOutput(true);
+                ps = new PrintStream(con.getOutputStream());
+                String buffer = "";
+                buffer += ("query") + ("=") + (rfid_tag);           // 변수 구분은 '&' 사용
+                Log.d("check3",buffer);
+
+                ps.print(buffer);
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                InputStream in = con.getInputStream();
+
+                BufferedReader r = new BufferedReader(new InputStreamReader(in));
+                String return_string = "";
+                StringBuilder total = new StringBuilder();
+                for (String line; (line = r.readLine()) != null; ) {
+                    total.append(line).append('\n');
+                }
+                return_string = total.toString();
+                Log.d("check",return_string);
+
+                JSONObject obj = new JSONObject(return_string);
+
+                int type_count = 0;
+                type_count = obj.getJSONObject("data").getJSONArray("rsbtypes").length();
+                all_pallet_types.clear();
+                for(int i=0;i<type_count;i++){
+                    Const.pallet_types.put(obj.getJSONObject("data").getJSONArray("rsbtypes").getJSONObject(i).getString("code"),obj.getJSONObject("data").getJSONArray("rsbtypes").getJSONObject(i).getString("id"));
+                    Const.all_pallet_types.add(obj.getJSONObject("data").getJSONArray("rsbtypes").getJSONObject(i).getString("code"));
+                    Const.all_pallet_types_id.add(obj.getJSONObject("data").getJSONArray("rsbtypes").getJSONObject(i).getString("id"));
+                    Const.all_pallet_types_unit.add(obj.getJSONObject("data").getJSONArray("rsbtypes").getJSONObject(i).getString("unit"));
+                    Const.all_pallet_types_cunit.add(obj.getJSONObject("data").getJSONArray("rsbtypes").getJSONObject(i).getString("cunit"));
+                }
+                Log.e("TAG3333","///////"+Const.all_pallet_types.toString());
+                startActivity(new Intent(SigninPage.this, SelectionPage.class));
+                ps.flush();
+                ps.close();
+
+            } catch (Exception ex) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(SigninPage.this, "Failed to load data, Please Log in again", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         }
     }
