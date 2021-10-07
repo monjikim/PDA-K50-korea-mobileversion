@@ -345,7 +345,9 @@ public class SigninPage extends Activity {
                 SharedPreferenceManager.setString(getApplicationContext(), "USER_PW", et_pw.getText().toString());
 
                 String query2 = "query {\n" +
-                        "   companies(where: {use_yn:1 type:35}) {\n" +
+                        "   companies(where: {use_yn:1 id : [\n" +
+                        "      6,56,105,74\n" +
+                        "    ]}) {\n" +
                         "    id\n" +
                         "    name\n" +
                         "    eng_name\n" +
