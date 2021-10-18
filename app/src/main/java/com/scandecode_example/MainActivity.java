@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
     int mStatus3 = 0;
     boolean thread_check = false;
     String server_return_string;
-    String const_ip = "www.npc-iot.com:7778"; //aws 서버
+    String const_ip = "www.npc-rental.com:7778"; //aws 서버
     //String const_ip = "119.201.111.73:7778"; //영천 서버
 
     //String const_ip = "124.194.93.51:7778";

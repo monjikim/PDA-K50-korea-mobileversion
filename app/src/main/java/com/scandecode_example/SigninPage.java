@@ -49,7 +49,7 @@ public class SigninPage extends Activity {
     Button bt_login;
     String token_value;
     String u_id,u_pw;
-    String const_ip = "www.npc-iot.com:7778"; //aws 서버
+    String const_ip = "www.npc-rental.com:7778"; //aws 서버
     //String const_ip = "119.201.111.73:7778"; //영천 서버
     //String const_ip = "124.194.93.51:7778";
 
@@ -218,8 +218,8 @@ public class SigninPage extends Activity {
             try {
 
                 PrintStream ps = null;
-                URL url = new URL("http://www.npc-iot.com:1337/auth/local");       // URL 설정
-                Log.d("sw : ","http://www.npc-iot.com:1337/auth/local");
+                URL url = new URL("http://www.npc-rental.com:1337/auth/local");       // URL 설정
+                Log.d("sw : ","http://www.npc-rental.com:1337/auth/local");
                 URLConnection con = url.openConnection();   // 접속
                 con.setDoOutput(true);
                 ps = new PrintStream(con.getOutputStream());
@@ -312,7 +312,7 @@ public class SigninPage extends Activity {
         public void run() {
             try {
                 PrintStream ps = null;
-                URL url = new URL("http://www.npc-iot.com:1337/graphql");       // URL 설정
+                URL url = new URL("http://www.npc-rental.com:1337/graphql");       // URL 설정
                 URLConnection con = url.openConnection();   // 접속
                 con.setRequestProperty("Authorization","Bearer "+token_value);
                 con.setRequestProperty("Method","POST");
@@ -381,7 +381,7 @@ public class SigninPage extends Activity {
         public void run() {
             try {
                 PrintStream ps = null;
-                URL url = new URL("http://www.npc-iot.com:1337/graphql");       // URL 설정
+                URL url = new URL("http://www.npc-rental.com:1337/graphql");       // URL 설정
                 URLConnection con = url.openConnection();   // 접속
                 con.setRequestProperty("Authorization","Bearer "+token_value);
                 con.setRequestProperty("Method","POST");
@@ -457,7 +457,7 @@ public class SigninPage extends Activity {
         public void run() {
             try {
                 PrintStream ps = null;
-                URL url = new URL("http://www.npc-iot.com:1337/graphql");       // URL 설정
+                URL url = new URL("http://www.npc-rental.com:1337/graphql");       // URL 설정
                 URLConnection con = url.openConnection();   // 접속
                 con.setRequestProperty("Authorization","Bearer "+token_value);
                 con.setRequestProperty("Method","POST");

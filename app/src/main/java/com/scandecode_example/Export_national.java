@@ -383,7 +383,7 @@ public class Export_national extends AppCompatActivity implements ZXingScannerVi
         it = Const.export_companies.entrySet().iterator();
         while(it.hasNext()){
             Map.Entry pair = (Map.Entry)it.next();
-            if(pair.getValue().toString().split("@")[1].equals("1")){
+            if(pair.getValue().toString().split("@")[1].equals("1") && !pair.getValue().toString().split("@")[2].equals(Const.company_id)){
                 temp_dest.add(pair.getKey().toString());
             }
         }
@@ -491,7 +491,7 @@ public class Export_national extends AppCompatActivity implements ZXingScannerVi
                 String error_message;
 
                 PrintStream ps = null;
-                URL url = new URL("http://www.npc-iot.com:1337/graphql");       // URL 설정
+                URL url = new URL("http://www.npc-rental.com:1337/graphql");       // URL 설정
                 URLConnection con = url.openConnection();   // 접속
                 con.setRequestProperty("Authorization","Bearer "+ Const.Tokeninfo);
                 con.setRequestProperty("Method","POST");
