@@ -344,23 +344,33 @@ public class SigninPage extends Activity {
                 SharedPreferenceManager.setString(getApplicationContext(), "USER_ID", et_id.getText().toString());
                 SharedPreferenceManager.setString(getApplicationContext(), "USER_PW", et_pw.getText().toString());
 
-                String query2 = "query {\n" +
-                        "   companies(where: {use_yn:1 id : [\n" +
-                        "      6,56,105,74\n" +
-                        "    ]}) {\n" +
-                        "    id\n" +
-                        "    name\n" +
-                        "    eng_name\n" +
-                        "    country{\n" +
-                        "      id\n" +
-                        "    }\n" +
-                        "  }\n" +
-                        "}\n";
-                LoginThread2 thread2 = new LoginThread2(query2);
-                try {
-                    thread2.start();
-                } catch (Exception e) {
-                    Log.d("abc", "thread error ///////////////////////////// ");
+                if(Const.company_id.equals("null")){
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(SigninPage.this, "인터넷이 잘 되는곳에서 다시 시도 바랍니다.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+                else{
+                    String query2 = "query {\n" +
+                            "   companies(where: {use_yn:1 id : [\n" +
+                            "      6,56,105,74\n" +
+                            "    ]}) {\n" +
+                            "    id\n" +
+                            "    name\n" +
+                            "    eng_name\n" +
+                            "    country{\n" +
+                            "      id\n" +
+                            "    }\n" +
+                            "  }\n" +
+                            "}\n";
+                    LoginThread2 thread2 = new LoginThread2(query2);
+                    try {
+                        thread2.start();
+                    } catch (Exception e) {
+                        Log.d("abc", "thread error ///////////////////////////// ");
+                    }
                 }
 //                startActivity(new Intent(SigninPage.this, SelectionPage.class));
                 ps.flush();

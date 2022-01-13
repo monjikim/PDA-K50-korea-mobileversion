@@ -12,7 +12,7 @@ public class Const {
     public static String const_ip = "";
     public static boolean changing_lang = false;
     public static String Tokeninfo = null;
-    public static String company_id = null;
+    public static String company_id = "null";
     public static String company_name = null;
     public static String server_time_zone = "";
     public static String server_time = "";
