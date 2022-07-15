@@ -19,14 +19,13 @@
 			android:layout_height="350dp">
 
 			<me.dm7.barcodescanner.zxing.ZXingScannerView
-				android:layout_weight="1"
-				android:visibility="invisible"
-				android:padding="5dp"
 				android:id="@+id/barcode_scanner"
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"
-				android:gravity="center">
-			</me.dm7.barcodescanner.zxing.ZXingScannerView>
+				android:layout_weight="1"
+				android:gravity="center"
+				android:padding="5dp"
+				android:visibility="invisible"></me.dm7.barcodescanner.zxing.ZXingScannerView>
 			<TextView
 				android:layout_alignParentBottom="true"
 				android:layout_gravity="center"

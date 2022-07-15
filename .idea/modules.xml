@@ -2,8 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/PDA-K50-koreapackage.iml" filepath="$PROJECT_DIR$/PDA-K50-koreapackage.iml" group="PDA-K50-koreapackage" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="PDA-K50-koreapackage/app" />
+      <module fileurl="file://$PROJECT_DIR$/PDA-K50-koreapackage.iml" filepath="$PROJECT_DIR$/PDA-K50-koreapackage.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/PDA-K50-koreapackage.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/PDA-K50-koreapackage.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/PDA-K50-koreapackage.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/PDA-K50-koreapackage.app.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/PDA-K50-koreapackage.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/PDA-K50-koreapackage.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/PDA-K50-koreapackage.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/PDA-K50-koreapackage.app.unitTest.iml" />
     </modules>
   </component>
 </project>
