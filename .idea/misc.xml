@@ -3,7 +3,9 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/swchung/IoT/git_control/PDA-K50-koreapackage/app/src/main/res/layout/log_in.xml" value="0.24409722222222222" />
         <entry key="..\:/swchung/IoT/git_control/PDA-K50-koreapackage/app/src/main/res/layout/scan_export_national.xml" value="0.24409722222222222" />
+        <entry key="..\:/swchung/IoT/git_control/PDA-K50-koreapackage/app/src/main/res/layout/selection_page.xml" value="0.24409722222222222" />
       </map>
     </option>
   </component>

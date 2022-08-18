@@ -309,6 +309,9 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
                                             }else if(order_array.size()<1){
                                                 Toast.makeText(MainActivity.this, "스캔된 데이터가 없습니다.", Toast.LENGTH_SHORT).show();
                                                 mStatus3 = 3;
+                                            }else if(Const.company_id.equals("null")){
+                                                Toast.makeText(MainActivity.this, "업체 정보가 잘못되었습니다.\n재로그인을 진행하세요.", Toast.LENGTH_SHORT).show();
+                                                mStatus3 = 3;
                                             }else{
                                                 thread_check = true;
                                                 mStatus3 = 1;
