@@ -1,23 +1,28 @@
 package com.scandecode_example;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.Point;
+import android.graphics.Rect;
+import android.media.Image;
 import android.media.ToneGenerator;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.SystemProperties;
 import android.provider.Settings;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.util.Size;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -28,11 +33,30 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import com.google.zxing.Result;
-import com.scandecode.ScanDecode;
-import com.scandecode.inf.ScanInterface;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.camera.core.CameraSelector;
+import androidx.camera.core.ImageAnalysis;
+import androidx.camera.core.ImageCapture;
+import androidx.camera.core.ImageProxy;
+import androidx.camera.core.Preview;
+import androidx.camera.lifecycle.ProcessCameraProvider;
+import androidx.camera.view.PreviewView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentManager;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.mlkit.vision.barcode.BarcodeScanner;
+import com.google.mlkit.vision.barcode.BarcodeScannerOptions;
+import com.google.mlkit.vision.barcode.BarcodeScanning;
+import com.google.mlkit.vision.barcode.common.Barcode;
+import com.google.mlkit.vision.common.InputImage;
 import com.scandecode_example.etc.PlayService;
-import com.speedata.libutils.DataConversionUtils;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -44,14 +68,17 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import constants.Const;
-import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
-public class MainActivity extends AppCompatActivity implements ZXingScannerView.ResultHandler {
+public class MainActivity extends AppCompatActivity {
     private EditText mReception;
     private TextView tvcound;
     private Button btnSingleScan, btnClear, btnTouch;
@@ -80,9 +107,264 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
     EditText container_no,seal_no;
     int thread_count = 0;
 
+    private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
+    private ExecutorService cameraExecutor;
+    private PreviewView previewView;
+    private MyImageAnalyzer analyzer;
+    Context mcontext;
+    Activity mactivity;
+    ProcessCameraProvider processCameraProvider;
+    ArrayList arrayList = new ArrayList();
 
-    ZXingScannerView barcode_scanner;
 
+//    ZXingScannerView barcode_scanner;
+
+
+    public class MyImageAnalyzer implements ImageAnalysis.Analyzer{
+        private FragmentManager fragmentManager;
+        private bottom_dialog bd;
+
+        public MyImageAnalyzer(FragmentManager fragmentManager){
+            this.fragmentManager = fragmentManager;
+            bd = new bottom_dialog();
+        }
+
+        @Override
+        public void analyze(@NonNull ImageProxy image) {
+            scanbarcode(image);
+        }
+
+        private void scanbarcode(final ImageProxy image) {
+            @SuppressLint("UnsafeOptInUsageError") Image image1 = image.getImage();
+            assert image1 != null;
+            InputImage inputImage = InputImage.fromMediaImage(image1,image.getImageInfo().getRotationDegrees());
+            BarcodeScannerOptions options =
+                    new BarcodeScannerOptions.Builder()
+                            .setBarcodeFormats(
+                                    Barcode.FORMAT_QR_CODE
+                            )
+                            .build();
+            //        BarcodeScanner scanner = BarcodeScanning.getClient();
+            // Or, to specify the formats to recognize:
+            BarcodeScanner scanner = BarcodeScanning.getClient(options);
+            Task<List<Barcode>> result = scanner.process(inputImage)
+                    .addOnSuccessListener(new OnSuccessListener<List<Barcode>>() {
+                        @Override
+                        public void onSuccess(List<Barcode> barcodes) {
+                            readerBarcodeData(barcodes);
+                            // Task completed successfully
+                            // ...
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            // Task failed with an exception
+                            // ...
+                        }
+                    })
+                    .addOnCompleteListener(new OnCompleteListener<List<Barcode>>() {
+                        @Override
+                        public void onComplete(@NonNull Task<List<Barcode>> task) {
+                            image.close();
+                        }
+                    });
+        }
+
+        private void readerBarcodeData(List<Barcode> barcodes) {
+            for (Barcode barcode : barcodes) {
+                Rect bounds = barcode.getBoundingBox();
+                Point[] corners = barcode.getCornerPoints();
+                String rawValue = barcode.getRawValue();
+                int valueType = barcode.getValueType();
+//                Log.e("TAG","valuetype : "+barcode.getValueType()+" rawvalue : "+barcode.getRawValue());
+                // See API reference for complete list of supported types
+                switch (valueType) {
+                    case Barcode.TYPE_WIFI:
+                        String ssid = barcode.getWifi().getSsid();
+                        String password = barcode.getWifi().getPassword();
+                        int type = barcode.getWifi().getEncryptionType();
+                        break;
+                    case Barcode.TYPE_URL:
+                        if(!bd.isAdded()){
+                            bd.show(fragmentManager,"");
+                        }
+                        bd.fetchurl(barcode.getUrl().getUrl());
+                        String title = barcode.getUrl().getTitle();
+                        String url = barcode.getUrl().getUrl();
+                        break;
+                    case Barcode.TYPE_TEXT:
+                        try{
+//                            if(!car_list.contains(rawValue)){
+//                                C_Export cthread = new C_Export(rawValue);
+//                                cthread.start();
+//                            }
+                            String data = rawValue;
+                            if(!arrayList.contains(data)){
+                                if(data.trim().length()> 10){
+                                    if(serial_no_flag){
+                                        if(data.trim().substring(0,3).equals("CP-")){
+                                            Toast.makeText(MainActivity.this, "오더 번호를 읽어주세요", Toast.LENGTH_SHORT).show();
+                                        }
+                                        else{
+                                            if(scancount == 0){
+                                                arrayList.add(data);
+                                                scancount+=1;
+                                                tv_count.setText(scancount+"");
+                                                serial_no_flag = false;
+                                                tv_order_no.setText(data.trim().substring(0,10));
+                                                tv_case_no.setText(data.substring(10,data.trim().length()));
+
+                                                order_array.add(tv_order_no.getText().toString().trim()+tv_case_no.getText().toString().trim());
+                                                serial_array.add(tv_serial_no.getText().toString().trim());
+
+                                                mReception.append(scancount+" "+tv_order_no.getText()+" "+tv_case_no.getText()+"\n"+tv_serial_no.getText()+"\n");
+
+                                                tv_order_no.setText("");
+                                                tv_case_no.setText("");
+                                                tv_serial_no.setText("");
+                                                Log.d("sw","LOGGGGGGGGGGGGGGGGGGGGGG/////"+order_array.toString()+"/////////"+serial_array.toString());
+                                            }else{
+                                                for(int i=0; i<order_array.size();i++){
+                                                    if(order_array.get(i).equals(data.trim())){
+                                                        order_check = true;
+                                                    }
+                                                }
+                                                if(order_check){
+                                                    order_check = false;
+                                                    Toast.makeText(MainActivity.this, "이미 등록된 오더 번호 입니다.", Toast.LENGTH_SHORT).show();
+                                                }else{
+                                                    arrayList.add(data);
+                                                    scancount+=1;
+                                                    tv_count.setText(scancount+"");
+                                                    serial_no_flag = false;
+                                                    tv_order_no.setText(data.trim().substring(0,10));
+                                                    tv_case_no.setText(data.substring(10,data.trim().length()));
+
+                                                    order_array.add(tv_order_no.getText().toString().trim()+tv_case_no.getText().toString().trim());
+                                                    serial_array.add(tv_serial_no.getText().toString().trim());
+                                                    mReception.append(scancount+" "+tv_order_no.getText()+" "+tv_case_no.getText()+"\n"+tv_serial_no.getText()+"\n");
+
+                                                    tv_order_no.setText("");
+                                                    tv_case_no.setText("");
+                                                    tv_serial_no.setText("");
+                                                    Log.d("sw","LOGGGGGGGGGGGGGGGGGGGGGG/////"+order_array.toString()+"/////////"+serial_array.toString());
+                                                }
+                                            }
+                                        }
+                                    }
+                                    else if (order_no_flag){
+                                        if(data.substring(0,3).equals("CP-")){
+                                            if(scancount == 0){
+                                                arrayList.add(data);
+                                                scancount+=1;
+                                                tv_count.setText(scancount+"");
+                                                order_no_flag = false;
+                                                tv_serial_no.setText(data.trim());
+
+                                                order_array.add(tv_order_no.getText().toString().trim()+tv_case_no.getText().toString().trim());
+                                                serial_array.add(tv_serial_no.getText().toString().trim());
+
+                                                mReception.append(scancount+" "+tv_order_no.getText()+" "+tv_case_no.getText()+" "+tv_serial_no.getText()+"\n");
+
+                                                tv_order_no.setText("");
+                                                tv_case_no.setText("");
+                                                tv_serial_no.setText("");
+                                                Log.d("sw","LOGGGGGGGGGGGGGGGGGGGGGG/////"+order_array.toString()+"/////////"+serial_array.toString());
+                                            }else{
+                                                for(int i=0; i<serial_array.size();i++){
+                                                    if(serial_array.get(i).equals(data.trim())){
+                                                        serial_check = true;
+                                                    }
+                                                }
+                                                if(serial_check){
+                                                    serial_check = false;
+                                                    Toast.makeText(MainActivity.this, "이미 등록된 시리얼 번호 입니다.", Toast.LENGTH_SHORT).show();
+                                                }else{
+                                                    arrayList.add(data);
+                                                    scancount+=1;
+                                                    tv_count.setText(scancount+"");
+                                                    order_no_flag = false;
+                                                    tv_serial_no.setText(data.trim());
+
+                                                    order_array.add(tv_order_no.getText().toString().trim()+tv_case_no.getText().toString().trim());
+                                                    serial_array.add(tv_serial_no.getText().toString().trim());
+
+                                                    mReception.append(scancount+" "+tv_order_no.getText()+" "+tv_case_no.getText()+" "+tv_serial_no.getText()+"\n");
+
+                                                    tv_order_no.setText("");
+                                                    tv_case_no.setText("");
+                                                    tv_serial_no.setText("");
+                                                    Log.d("sw","LOGGGGGGGGGGGGGGGGGGGGGG/////"+order_array.toString()+"/////////"+serial_array.toString());
+                                                }
+                                            }
+                                        }
+                                        else{
+                                            Toast.makeText(MainActivity.this, "시리얼 번호를 읽어주세요", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                    else{
+                                        if(data.substring(0,3).equals("CP-")){
+                                            if(scancount == 0){
+                                                arrayList.add(data);
+                                                serial_no_flag = true;
+                                                tv_serial_no.setText(data.trim());
+                                            }else{
+                                                for(int i=0; i<serial_array.size();i++){
+                                                    if(serial_array.get(i).equals(data.trim())){
+                                                        serial_check = true;
+                                                    }
+                                                }
+                                                if(serial_check){
+                                                    serial_check = false;
+                                                    Toast.makeText(MainActivity.this, "이미 등록된 시리얼 번호 입니다.", Toast.LENGTH_SHORT).show();
+                                                }else{
+                                                    arrayList.add(data);
+                                                    serial_no_flag = true;
+                                                    tv_serial_no.setText(data.trim());
+                                                }
+                                            }
+                                        }
+                                        else{
+                                            if(scancount == 0){
+                                                arrayList.add(data);
+                                                order_no_flag= true;
+                                                tv_order_no.setText(data.trim().substring(0,10));
+                                                tv_case_no.setText(data.substring(10,data.trim().length()));
+                                            }else{
+                                                for(int i=0; i<order_array.size();i++){
+                                                    if(order_array.get(i).equals(data.trim())){
+                                                        order_check = true;
+                                                    }
+                                                }
+                                                if(order_check){
+                                                    order_check = false;
+                                                    Toast.makeText(MainActivity.this, "이미 등록된 오더 번호 입니다.", Toast.LENGTH_SHORT).show();
+                                                }else{
+                                                    arrayList.add(data);
+                                                    order_no_flag= true;
+                                                    tv_order_no.setText(data.trim().substring(0,10));
+                                                    tv_case_no.setText(data.substring(10,data.trim().length()));
+                                                }
+                                            }
+                                        }
+                                    }
+//                                    scancount+=1;
+                                    //tvcound.setText(getString(R.string.scan_time)+scancount+"");
+//                                    mReception.append(data+"\n");
+                                }else{
+                                    Toast.makeText(MainActivity.this, "Please check barcode No.", Toast.LENGTH_SHORT).show();
+                                }
+
+                            }
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                        break;
+                }
+            }
+        }
+    }
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -92,6 +374,39 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
 //        scanDecode = new ScanDecode(this);
 //        scanDecode.initService("true");//初始化扫描服务
         //btnSingleScan = (Button) findViewById(R.id.buttonscan);
+
+
+        mcontext = this;
+        mactivity = this;
+
+        previewView = findViewById(R.id.previewview);
+        this.getWindow().setFlags(1024,1024);
+
+        cameraExecutor = Executors.newSingleThreadExecutor();
+        cameraProviderFuture = ProcessCameraProvider.getInstance(mcontext);
+
+        analyzer = new MyImageAnalyzer(getSupportFragmentManager());
+
+
+        cameraProviderFuture.addListener(new Runnable() {
+            @Override
+            public void run() {
+                try{
+                    if(ActivityCompat.checkSelfPermission(mcontext, Manifest.permission.CAMERA) != (PackageManager.PERMISSION_GRANTED)){
+                        ActivityCompat.requestPermissions(mactivity,new String[] {Manifest.permission.CAMERA},101);
+                    }else{
+                        processCameraProvider = (ProcessCameraProvider) cameraProviderFuture.get();
+                        bindpreview(processCameraProvider);
+                    }
+                }catch (ExecutionException e){
+                    e.printStackTrace();
+                }catch (InterruptedException e){
+                    e.printStackTrace();
+                }
+            }
+        }, ContextCompat.getMainExecutor(this));
+
+
         btnClear = (Button) findViewById(R.id.buttonclear);
         toggleButtonRepeat = (ToggleButton) findViewById(R.id.button_repeat);
         mReception = (EditText) findViewById(R.id.EditTextReception);
@@ -107,6 +422,7 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
                 }else{
                     Toast.makeText(MainActivity.this, "초기화 하였습니다", Toast.LENGTH_SHORT).show();
                 }
+                arrayList.clear();
                 container_no.setText("");
                 seal_no.setText("");
                 mReception.setText(""); //清屏
@@ -139,7 +455,7 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
 //        tv_title = (TextView)findViewById(R.id.tv_title);
 
         //zxing
-        barcode_scanner = (ZXingScannerView)findViewById(R.id.barcode_scanner);
+//        barcode_scanner = (ZXingScannerView)findViewById(R.id.barcode_scanner);
 
         order_array = new ArrayList();
         serial_array = new ArrayList();
@@ -273,6 +589,16 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
                 if(order_array.size() <= 0){
                     Toast.makeText(MainActivity.this, "작업 이후에 선택해주세요.", Toast.LENGTH_SHORT).show();
                 }else{
+                    if(order_no_flag){
+                        arrayList.remove(arrayList.size()-2);
+                        arrayList.remove(arrayList.size()-2);
+                    }else if(serial_no_flag){
+                        arrayList.remove(arrayList.size()-2);
+                        arrayList.remove(arrayList.size()-2);
+                    }else{
+                        arrayList.remove(arrayList.size()-1);
+                        arrayList.remove(arrayList.size()-1);
+                    }
                     order_array.remove(order_array.size()-1);
                     serial_array.remove(serial_array.size()-1);
                     tv_order_no.setText("");
@@ -451,9 +777,34 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
                     handler.removeCallbacks(startTask);
                     handler.postDelayed(startTask, 0);*/
                     ////////////////////////
-                    barcode_scanner.setResultHandler(MainActivity.this);
-                    barcode_scanner.startCamera();
-                    barcode_scanner.setVisibility(View.VISIBLE);
+//                    barcode_scanner.setResultHandler(MainActivity.this);
+//                    barcode_scanner.startCamera();
+//                    barcode_scanner.setVisibility(View.VISIBLE);
+                    if(cameraProviderFuture != null){
+                        cameraProviderFuture = null;
+                    }
+                    if(previewView.getVisibility() == View.GONE)
+                    {
+                        previewView.setVisibility(View.VISIBLE);
+                    }
+                    cameraProviderFuture = ProcessCameraProvider.getInstance(mcontext);
+                    cameraProviderFuture.addListener(new Runnable() {
+                        @Override
+                        public void run() {
+                            try{
+                                if(ActivityCompat.checkSelfPermission(mcontext, Manifest.permission.CAMERA) != (PackageManager.PERMISSION_GRANTED)){
+                                    ActivityCompat.requestPermissions(mactivity,new String[] {Manifest.permission.CAMERA},101);
+                                }else{
+                                    processCameraProvider = (ProcessCameraProvider) cameraProviderFuture.get();
+                                    bindpreview(processCameraProvider);
+                                }
+                            }catch (ExecutionException e){
+                                e.printStackTrace();
+                            }catch (InterruptedException e){
+                                e.printStackTrace();
+                            }
+                        }
+                    }, ContextCompat.getMainExecutor(mcontext));
                     ////////////////////////
                 } else {
 //                    scan_start = false;
@@ -462,8 +813,11 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
 
 
                     ////////////////////////
-                    barcode_scanner.stopCamera();
-                    barcode_scanner.setVisibility(View.INVISIBLE);
+//                    barcode_scanner.stopCamera();
+//                    barcode_scanner.setVisibility(View.INVISIBLE);
+
+                    processCameraProvider.unbindAll();
+                    previewView.setVisibility(View.GONE);
                     ////////////////////////
                 }
             }
@@ -740,9 +1094,63 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
     }
 
 
+    private void bindpreview(ProcessCameraProvider processCameraProvider1) {
+        Preview preview = new Preview.Builder().build();
+        CameraSelector cameraSelector = new CameraSelector.Builder().requireLensFacing(CameraSelector.LENS_FACING_BACK).build();
+        preview.setSurfaceProvider(previewView.getSurfaceProvider());
+        ImageCapture imageCapture = new ImageCapture.Builder().build();
+        ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
+//                .setTargetResolution(new Size(1280,720))
+                .setTargetResolution(new Size(1920,1080))
+                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                .build();
+        imageAnalysis.setAnalyzer(cameraExecutor,analyzer);
 
-
-
+//        {
+//            ImageAnalysis analysisUseCase;
+//            int lensFacing = CameraSelector.LENS_FACING_BACK;
+//
+//            ImageAnalysis.Builder builder = new ImageAnalysis.Builder();
+//            Size targetResolution = PreferenceUtils.getCameraXTargetResolution(this, lensFacing);
+//            if (targetResolution != null) {
+//                builder.setTargetResolution(targetResolution);
+//            }
+//            analysisUseCase = builder.build();
+//
+//            needUpdateGraphicOverlayImageSourceInfo = true;
+//            analysisUseCase.setAnalyzer(
+//                    // imageProcessor.processImageProxy will use another thread to run the detection underneath,
+//                    // thus we can just runs the analyzer itself on main thread.
+//                    ContextCompat.getMainExecutor(this),
+//                    imageProxy -> {
+//                        if (needUpdateGraphicOverlayImageSourceInfo) {
+//                            boolean isImageFlipped = lensFacing == CameraSelector.LENS_FACING_FRONT;
+//                            int rotationDegrees = imageProxy.getImageInfo().getRotationDegrees();
+//                            if (rotationDegrees == 0 || rotationDegrees == 180) {
+//                                graphicOverlay.setImageSourceInfo(
+//                                        imageProxy.getWidth(), imageProxy.getHeight(), isImageFlipped);
+//                            } else {
+//                                graphicOverlay.setImageSourceInfo(
+//                                        imageProxy.getHeight(), imageProxy.getWidth(), isImageFlipped);
+//                            }
+//                            needUpdateGraphicOverlayImageSourceInfo = false;
+//                        }
+//                        try {
+//                            VisionImageProcessor imageProcessor;
+//                            imageProcessor = new BarcodeScannerProcessor(this);
+//                            imageProcessor.processImageProxy(imageProxy, graphicOverlay);
+//                        } catch (MlKitException e) {
+//                            Log.e(TAG, "Failed to process image. Error: " + e.getLocalizedMessage());
+//                            Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT)
+//                                    .show();
+//                        }
+//                    });
+//
+//            processCameraProvider.bindToLifecycle(/* lifecycleOwner= */ this, cameraSelector, analysisUseCase);
+//        }
+        processCameraProvider1.unbindAll();
+        processCameraProvider1.bindToLifecycle(this,cameraSelector,preview,imageCapture,imageAnalysis);
+    }
 
     //Receiving broadcast
     private String RECE_DATA_ACTION = "com.se4500.onDecodeComplete";
@@ -759,7 +1167,7 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
 
 
 
-    private void judgePropert() {
+    /*private void judgePropert() {
         String result = SystemProperties.get("persist.sys.keyreport", "true");
         if (result.equals("false")) {
             new AlertDialog.Builder(this)
@@ -783,7 +1191,7 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
                             }
                     ).show();
         }
-    }
+    }*/
 
     boolean isRepeat = false;
     private void startScan() {
@@ -792,26 +1200,8 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
         sendBroadcast(intent, null);
     }
 
-    @Override
+    /*@Override
     public void handleResult(Result result) {
-//
-//        if(!car_list.contains(result.getText())){
-//            flag = "camera";
-//            C_Import cthread = new C_Import(result.getText());
-//            cthread.start();
-//        }else{
-//            Toast.makeText(this, "번호를 확인해 주세요", Toast.LENGTH_SHORT).show();
-//
-//            vib.vibrate(new long[]{500,1000,500,1000,500,1000},-1);
-//            tg.startTone(ToneGenerator.TONE_PROP_NACK);
-//            if(isSwitchChecked){
-//                disable_nfc = false;
-//            }
-//            else{
-//                barcode_scanner.setResultHandler(Pallet_Import_NPC.this);
-//                barcode_scanner.startCamera();
-//            }
-//        }
 
         String data = result.getText().trim();
         if(data.trim().length()> 10){
@@ -949,9 +1339,9 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
                     }
                 }
             }
-                    /*scancount+=1;
+                    scancount+=1;
                     //tvcound.setText(getString(R.string.scan_time)+scancount+"");
-                    mReception.append(data+"\n");*/
+                    mReception.append(data+"\n");
 
         }else{
             Toast.makeText(MainActivity.this, "Please check barcode No.", Toast.LENGTH_SHORT).show();
@@ -959,7 +1349,7 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
 
         barcode_scanner.setResultHandler(MainActivity.this);
         barcode_scanner.startCamera();
-    }
+    }*/
 //
 //    class C_Import extends Thread {
 //        String s_n;
@@ -1172,7 +1562,7 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
         super.onResume();
 
         if(toggleButtonRepeat.isChecked()){
-            barcode_scanner.resumeCameraPreview(MainActivity.this);
+//            barcode_scanner.resumeCameraPreview(MainActivity.this);
         }
     }
 

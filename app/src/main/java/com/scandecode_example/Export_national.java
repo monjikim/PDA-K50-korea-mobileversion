@@ -1,20 +1,26 @@
 package com.scandecode_example;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.Point;
+import android.graphics.Rect;
+import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.util.Size;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
@@ -34,9 +40,29 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import com.google.zxing.Result;
-import com.scandecode.ScanDecode;
-import com.scandecode.inf.ScanInterface;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.camera.core.CameraSelector;
+import androidx.camera.core.ImageAnalysis;
+import androidx.camera.core.ImageCapture;
+import androidx.camera.core.ImageProxy;
+import androidx.camera.core.Preview;
+import androidx.camera.lifecycle.ProcessCameraProvider;
+import androidx.camera.view.PreviewView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentManager;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.mlkit.vision.barcode.BarcodeScanner;
+import com.google.mlkit.vision.barcode.BarcodeScannerOptions;
+import com.google.mlkit.vision.barcode.BarcodeScanning;
+import com.google.mlkit.vision.barcode.common.Barcode;
+import com.google.mlkit.vision.common.InputImage;
 import com.scandecode_example.etc.SharedPrefManager;
 
 import org.json.JSONObject;
@@ -53,16 +79,19 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import constants.Const;
-import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
-public class Export_national extends AppCompatActivity implements ZXingScannerView.ResultHandler {
+public class Export_national extends AppCompatActivity {
 
 
     //sw value
@@ -87,7 +116,7 @@ public class Export_national extends AppCompatActivity implements ZXingScannerVi
     TextView tv_date,tv_count;
     Spinner target_numb2;
     ToggleButton toggleButtonRepeat;
-    ZXingScannerView barcode_scanner;
+//    ZXingScannerView barcode_scanner;
     Button btnClear,button_undo,button_send;
     EditText mReception;
 
@@ -98,12 +127,162 @@ public class Export_national extends AppCompatActivity implements ZXingScannerVi
     Button btn_add_serial,btn_add_cancel,manual_input_data;
     EditText Serial_no;
 
+    private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
+    private ExecutorService cameraExecutor;
+    private PreviewView previewView;
+    private MyImageAnalyzer analyzer;
+    Context mcontext;
+    Activity mactivity;
+    ProcessCameraProvider processCameraProvider;
+    ArrayList arrayList = new ArrayList();
+
+
+//    ZXingScannerView barcode_scanner;
+
+
+    public class MyImageAnalyzer implements ImageAnalysis.Analyzer{
+        private FragmentManager fragmentManager;
+        private bottom_dialog bd;
+
+        public MyImageAnalyzer(FragmentManager fragmentManager){
+            this.fragmentManager = fragmentManager;
+            bd = new bottom_dialog();
+        }
+
+        @Override
+        public void analyze(@NonNull ImageProxy image) {
+            scanbarcode(image);
+        }
+
+        private void scanbarcode(final ImageProxy image) {
+            @SuppressLint("UnsafeOptInUsageError") Image image1 = image.getImage();
+            assert image1 != null;
+            InputImage inputImage = InputImage.fromMediaImage(image1,image.getImageInfo().getRotationDegrees());
+            BarcodeScannerOptions options =
+                    new BarcodeScannerOptions.Builder()
+                            .setBarcodeFormats(
+                                    Barcode.FORMAT_QR_CODE
+                            )
+                            .build();
+            //        BarcodeScanner scanner = BarcodeScanning.getClient();
+            // Or, to specify the formats to recognize:
+            BarcodeScanner scanner = BarcodeScanning.getClient(options);
+            Task<List<Barcode>> result = scanner.process(inputImage)
+                    .addOnSuccessListener(new OnSuccessListener<List<Barcode>>() {
+                        @Override
+                        public void onSuccess(List<Barcode> barcodes) {
+                            readerBarcodeData(barcodes);
+                            // Task completed successfully
+                            // ...
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            // Task failed with an exception
+                            // ...
+                        }
+                    })
+                    .addOnCompleteListener(new OnCompleteListener<List<Barcode>>() {
+                        @Override
+                        public void onComplete(@NonNull Task<List<Barcode>> task) {
+                            image.close();
+                        }
+                    });
+        }
+
+        private void readerBarcodeData(List<Barcode> barcodes) {
+            for (Barcode barcode : barcodes) {
+                Rect bounds = barcode.getBoundingBox();
+                Point[] corners = barcode.getCornerPoints();
+                String rawValue = barcode.getRawValue();
+                int valueType = barcode.getValueType();
+//                Log.e("TAG","valuetype : "+barcode.getValueType()+" rawvalue : "+barcode.getRawValue());
+                // See API reference for complete list of supported types
+                switch (valueType) {
+                    case Barcode.TYPE_WIFI:
+                        String ssid = barcode.getWifi().getSsid();
+                        String password = barcode.getWifi().getPassword();
+                        int type = barcode.getWifi().getEncryptionType();
+                        break;
+                    case Barcode.TYPE_URL:
+                        if(!bd.isAdded()){
+                            bd.show(fragmentManager,"");
+                        }
+                        bd.fetchurl(barcode.getUrl().getUrl());
+                        String title = barcode.getUrl().getTitle();
+                        String url = barcode.getUrl().getUrl();
+                        break;
+                    case Barcode.TYPE_TEXT:
+                        try{
+//                            if(!car_list.contains(rawValue)){
+//                                C_Export cthread = new C_Export(rawValue);
+//                                cthread.start();
+//                            }
+                            String data = rawValue.trim();
+                            if(!arrayList.contains(data)){
+                                if(data.trim().length()> 10){
+                                    if(data.startsWith("CP-")){
+                                        arrayList.add(data);
+                                        arr.add(data);
+                                        mReception.append(""+data+"\n");
+                                        scancount+=1;
+                                        tv_count.setText(""+(scancount));
+                                    }
+//                                    scancount+=1;
+                                    //tvcound.setText(getString(R.string.scan_time)+scancount+"");
+//                                    mReception.append(data+"\n");
+                                }else{
+                                    Toast.makeText(mContext, "QR코드를 확인해주세요", Toast.LENGTH_SHORT).show();
+                                }
+
+                            }
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                        break;
+                }
+            }
+        }
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.scan_export_national);
         mainScreen();
+
+        mcontext = this;
+        mactivity = this;
+
+        previewView = findViewById(R.id.previewview);
+        this.getWindow().setFlags(1024,1024);
+
+        cameraExecutor = Executors.newSingleThreadExecutor();
+        cameraProviderFuture = ProcessCameraProvider.getInstance(mcontext);
+
+        analyzer = new MyImageAnalyzer(getSupportFragmentManager());
+
+
+        cameraProviderFuture.addListener(new Runnable() {
+            @Override
+            public void run() {
+                try{
+                    if(ActivityCompat.checkSelfPermission(mcontext, Manifest.permission.CAMERA) != (PackageManager.PERMISSION_GRANTED)){
+                        ActivityCompat.requestPermissions(mactivity,new String[] {Manifest.permission.CAMERA},101);
+                    }else{
+                        processCameraProvider = (ProcessCameraProvider) cameraProviderFuture.get();
+                        bindpreview(processCameraProvider);
+                    }
+                }catch (ExecutionException e){
+                    e.printStackTrace();
+                }catch (InterruptedException e){
+                    e.printStackTrace();
+                }
+            }
+        }, ContextCompat.getMainExecutor(this));
+
 
         toggleButtonRepeat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -118,15 +297,42 @@ public class Export_national extends AppCompatActivity implements ZXingScannerVi
                     handler.removeCallbacks(startTask);
                     handler.postDelayed(startTask, 0);*/
                     ////////////////////////
-                    barcode_scanner.setResultHandler(Export_national.this);
-                    barcode_scanner.startCamera();
-                    barcode_scanner.setVisibility(View.VISIBLE);
+//                    barcode_scanner.setResultHandler(Export_national.this);
+//                    barcode_scanner.startCamera();
+//                    barcode_scanner.setVisibility(View.VISIBLE);
+                    if(cameraProviderFuture != null){
+                        cameraProviderFuture = null;
+                    }
+                    if(previewView.getVisibility() == View.GONE)
+                    {
+                        previewView.setVisibility(View.VISIBLE);
+                    }
+                    cameraProviderFuture = ProcessCameraProvider.getInstance(mcontext);
+                    cameraProviderFuture.addListener(new Runnable() {
+                        @Override
+                        public void run() {
+                            try{
+                                if(ActivityCompat.checkSelfPermission(mcontext, Manifest.permission.CAMERA) != (PackageManager.PERMISSION_GRANTED)){
+                                    ActivityCompat.requestPermissions(mactivity,new String[] {Manifest.permission.CAMERA},101);
+                                }else{
+                                    processCameraProvider = (ProcessCameraProvider) cameraProviderFuture.get();
+                                    bindpreview(processCameraProvider);
+                                }
+                            }catch (ExecutionException e){
+                                e.printStackTrace();
+                            }catch (InterruptedException e){
+                                e.printStackTrace();
+                            }
+                        }
+                    }, ContextCompat.getMainExecutor(mcontext));
                     ////////////////////////
                 }
                 else {
                     ////////////////////////
-                    barcode_scanner.stopCamera();
-                    barcode_scanner.setVisibility(View.INVISIBLE);
+//                    barcode_scanner.stopCamera();
+//                    barcode_scanner.setVisibility(View.INVISIBLE);
+                    processCameraProvider.unbindAll();
+                    previewView.setVisibility(View.GONE);
                     ////////////////////////
                 }
             }
@@ -144,6 +350,7 @@ public class Export_national extends AppCompatActivity implements ZXingScannerVi
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     Toast.makeText(mContext, "초기화 하였습니다", Toast.LENGTH_SHORT).show();
+                                    arrayList.clear();
                                     mReception.setText(""); //清屏
                                     arr.clear();
                                     scancount=0;
@@ -170,6 +377,7 @@ public class Export_national extends AppCompatActivity implements ZXingScannerVi
                     Toast.makeText(mContext, "작업 이후에 선택해주세요.", Toast.LENGTH_SHORT).show();
                 }
                 else{
+                    arrayList.remove(arrayList.size()-1);
                     arr.remove(arr.size()-1);
                     Toast.makeText(mContext, "마지막 작업이 삭제 되었습니다.", Toast.LENGTH_SHORT).show();
                     mReception.setText(mReception.getText().subSequence(0,(mReception.length()-14)));
@@ -281,34 +489,40 @@ public class Export_national extends AppCompatActivity implements ZXingScannerVi
                 //getCheckedRadioButtonId() 의 리턴값은 선택된 RadioButton 의 id 값.
                 RadioButton rb = (RadioButton) findViewById(id);
 
-                String check_serial = Serial_no.getText().toString().trim();
-                if(check_serial.length() != 6){
-                    Toast.makeText(mContext, "Serial 번호가 올바르지 않습니다.", Toast.LENGTH_SHORT).show();
-                }
-                else{
-                    if(arr.size()==0){
-                        mReception.setText("");
+                //rb check
+                if(rb != null){
+                    String check_serial = Serial_no.getText().toString().trim();
+                    if(check_serial.length() != 6){
+                        Toast.makeText(mContext, "Serial 번호가 올바르지 않습니다.", Toast.LENGTH_SHORT).show();
                     }
-                    add_serial = rb.getText().toString().trim()+" "+check_serial;
-                    for (int i = 0; i < arr.size(); i++) {
-                        if (arr.get(i).equals(add_serial)) {
-                            serial_check = true;
+                    else{
+                        if(arr.size()==0){
+                            mReception.setText("");
                         }
-                    }
-                    if (!serial_check) {
-                        arr.add(add_serial);
-                        scancount+=1;
-                        mReception.append(""+add_serial+"\n");
+                        add_serial = rb.getText().toString().trim()+" "+check_serial;
+                        for (int i = 0; i < arr.size(); i++) {
+                            if (arr.get(i).equals(add_serial)) {
+                                serial_check = true;
+                            }
+                        }
+                        if (!serial_check) {
+                            arr.add(add_serial);
+                            scancount+=1;
+                            mReception.append(""+add_serial+"\n");
 //                        mReception.append("" + arr.get(textadding).toString() + "   >>   [ ");
 //                        mReception.append(String.format("%3d", textadding + 1));
 //                        mReception.append(" ] Scanned\n");
-                        tv_count.setText(""+(scancount));
-                        viewManualPopup();
-                    } else {
-                        Toast.makeText(mContext, "이미 입력된 Serial 번호입니다.", Toast.LENGTH_SHORT).show();
-                    }
-                    serial_check = false;
-                }//serial 번호 체크
+                            tv_count.setText(""+(scancount));
+                            viewManualPopup();
+                        } else {
+                            Toast.makeText(mContext, "이미 입력된 Serial 번호입니다.", Toast.LENGTH_SHORT).show();
+                        }
+                        serial_check = false;
+                    }//serial 번호 체크
+                }
+                else{
+                    Toast.makeText(mContext, "타입을 선택해주세요.", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         btn_add_cancel.setOnClickListener(new View.OnClickListener() {
@@ -325,6 +539,65 @@ public class Export_national extends AppCompatActivity implements ZXingScannerVi
             }
         });
     }
+
+    private void bindpreview(ProcessCameraProvider processCameraProvider1) {
+        Preview preview = new Preview.Builder().build();
+        CameraSelector cameraSelector = new CameraSelector.Builder().requireLensFacing(CameraSelector.LENS_FACING_BACK).build();
+        preview.setSurfaceProvider(previewView.getSurfaceProvider());
+        ImageCapture imageCapture = new ImageCapture.Builder().build();
+        ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
+//                .setTargetResolution(new Size(1280,720))
+                .setTargetResolution(new Size(1920,1080))
+                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                .build();
+        imageAnalysis.setAnalyzer(cameraExecutor,analyzer);
+
+//        {
+//            ImageAnalysis analysisUseCase;
+//            int lensFacing = CameraSelector.LENS_FACING_BACK;
+//
+//            ImageAnalysis.Builder builder = new ImageAnalysis.Builder();
+//            Size targetResolution = PreferenceUtils.getCameraXTargetResolution(this, lensFacing);
+//            if (targetResolution != null) {
+//                builder.setTargetResolution(targetResolution);
+//            }
+//            analysisUseCase = builder.build();
+//
+//            needUpdateGraphicOverlayImageSourceInfo = true;
+//            analysisUseCase.setAnalyzer(
+//                    // imageProcessor.processImageProxy will use another thread to run the detection underneath,
+//                    // thus we can just runs the analyzer itself on main thread.
+//                    ContextCompat.getMainExecutor(this),
+//                    imageProxy -> {
+//                        if (needUpdateGraphicOverlayImageSourceInfo) {
+//                            boolean isImageFlipped = lensFacing == CameraSelector.LENS_FACING_FRONT;
+//                            int rotationDegrees = imageProxy.getImageInfo().getRotationDegrees();
+//                            if (rotationDegrees == 0 || rotationDegrees == 180) {
+//                                graphicOverlay.setImageSourceInfo(
+//                                        imageProxy.getWidth(), imageProxy.getHeight(), isImageFlipped);
+//                            } else {
+//                                graphicOverlay.setImageSourceInfo(
+//                                        imageProxy.getHeight(), imageProxy.getWidth(), isImageFlipped);
+//                            }
+//                            needUpdateGraphicOverlayImageSourceInfo = false;
+//                        }
+//                        try {
+//                            VisionImageProcessor imageProcessor;
+//                            imageProcessor = new BarcodeScannerProcessor(this);
+//                            imageProcessor.processImageProxy(imageProxy, graphicOverlay);
+//                        } catch (MlKitException e) {
+//                            Log.e(TAG, "Failed to process image. Error: " + e.getLocalizedMessage());
+//                            Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT)
+//                                    .show();
+//                        }
+//                    });
+//
+//            processCameraProvider.bindToLifecycle(/* lifecycleOwner= */ this, cameraSelector, analysisUseCase);
+//        }
+        processCameraProvider1.unbindAll();
+        processCameraProvider1.bindToLifecycle(this,cameraSelector,preview,imageCapture,imageAnalysis);
+    }
+
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
@@ -367,7 +640,7 @@ public class Export_national extends AppCompatActivity implements ZXingScannerVi
         tv_date.setText(date_result);
         toggleButtonRepeat = (ToggleButton) findViewById(R.id.button_repeat);
         //zxing
-        barcode_scanner = (ZXingScannerView)findViewById(R.id.barcode_scanner);
+//        barcode_scanner = (ZXingScannerView)findViewById(R.id.barcode_scanner);
         btnClear = (Button)findViewById(R.id.btnClear);
         button_undo = (Button)findViewById(R.id.button_undo);
         button_send = (Button)findViewById(R.id.button_send);
@@ -447,7 +720,7 @@ public class Export_national extends AppCompatActivity implements ZXingScannerVi
         }
     }
 
-    @Override
+    /*@Override
     public void handleResult(Result result) {
 
         String data = result.getText().trim();
@@ -473,7 +746,7 @@ public class Export_national extends AppCompatActivity implements ZXingScannerVi
         }
         barcode_scanner.setResultHandler(Export_national.this);
         barcode_scanner.startCamera();
-    }
+    }*/
 
     class PDAExportThread extends Thread {
         String server_query;

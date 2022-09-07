@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -136,8 +136,8 @@
             android:layout_marginBottom="20dp"
             android:lineHeight="23sp"
             android:layout_gravity="center"
-            android:text="RSP Pallet\nAndroid OS\nver. 1.0.0.1"
+            android:text="RSP Pallet\nAndroid OS\nver. 22.09.06"
             android:textSize="15sp" />
     </LinearLayout>
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
