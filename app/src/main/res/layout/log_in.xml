@@ -136,7 +136,7 @@
             android:layout_marginBottom="20dp"
             android:lineHeight="23sp"
             android:layout_gravity="center"
-            android:text="RSP Pallet\nAndroid OS\nver. 22.09.06"
+            android:text="RSP Pallet\nAndroid OS\nver. 22.09.27"
             android:textSize="15sp" />
     </LinearLayout>
 
