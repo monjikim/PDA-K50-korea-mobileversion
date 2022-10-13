@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">NPC Scanner</string>
+    <string name="app_name">NPC 포장 scanner</string>
      <string name="barcode_name">Barcode Scan</string>
     <string name="but_start">Single Scan</string>
     <string name="but_stop">스캔\n중지</string>

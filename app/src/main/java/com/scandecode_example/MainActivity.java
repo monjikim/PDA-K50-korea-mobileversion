@@ -29,6 +29,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -82,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText mReception;
     private TextView tvcound;
     private Button btnSingleScan, btnClear, btnTouch;
-    private ToggleButton toggleButtonRepeat,toggleButtonSound,toggleButtonVibrate;
+    private ToggleButton toggleButtonRepeat,button_single,toggleButtonVibrate;
     private boolean isFlag = false;
     private int scancount = 0;
 //    private ScanInterface scanDecode;
@@ -115,6 +116,10 @@ public class MainActivity extends AppCompatActivity {
     Activity mactivity;
     ProcessCameraProvider processCameraProvider;
     ArrayList arrayList = new ArrayList();
+    boolean touch_on = false;
+    boolean single_scan = false;
+    boolean multi_scan = false;
+    ImageView background_image;
 
 
 //    ZXingScannerView barcode_scanner;
@@ -164,7 +169,17 @@ public class MainActivity extends AppCompatActivity {
                     .addOnSuccessListener(new OnSuccessListener<List<Barcode>>() {
                         @Override
                         public void onSuccess(List<Barcode> barcodes) {
-                            readerBarcodeData(barcodes);
+                            if(single_scan){
+                                if(touch_on){
+                                    readerBarcodeData(barcodes);
+                                }
+                                else{
+
+                                }
+                            }
+                            else{
+                                readerBarcodeData(barcodes);
+                            }
                             // Task completed successfully
                             // ...
                         }
@@ -362,6 +377,11 @@ public class MainActivity extends AppCompatActivity {
                                             }
                                         }
                                     }
+
+                                    if(single_scan){
+                                        background_image.setBackground(getResources().getDrawable(R.drawable.background_image));
+                                        touch_on = false;
+                                    }
 //                                    scancount+=1;
                                     //tvcound.setText(getString(R.string.scan_time)+scancount+"");
 //                                    mReception.append(data+"\n");
@@ -391,15 +411,29 @@ public class MainActivity extends AppCompatActivity {
 
         mcontext = this;
         mactivity = this;
-
+        background_image = findViewById(R.id.background_image);
         previewView = findViewById(R.id.previewview);
+        previewView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(single_scan){
+                    if(touch_on){
+                        background_image.setBackground(getResources().getDrawable(R.drawable.background_image));
+                        touch_on = false;
+                    }
+                    else{
+                        background_image.setBackground(getResources().getDrawable(R.drawable.background_image_on));
+                        touch_on = true;
+                    }
+                }
+            }
+        });
         this.getWindow().setFlags(1024,1024);
 
         cameraExecutor = Executors.newSingleThreadExecutor();
         cameraProviderFuture = ProcessCameraProvider.getInstance(mcontext);
 
         analyzer = new MyImageAnalyzer(getSupportFragmentManager());
-
 
         cameraProviderFuture.addListener(new Runnable() {
             @Override
@@ -422,6 +456,7 @@ public class MainActivity extends AppCompatActivity {
 
         btnClear = (Button) findViewById(R.id.buttonclear);
         toggleButtonRepeat = (ToggleButton) findViewById(R.id.button_repeat);
+        button_single = (ToggleButton) findViewById(R.id.button_single);
         mReception = (EditText) findViewById(R.id.EditTextReception);
 //        btnStop = (Button) findViewById(R.id.buttonstop);
 //        btnStop.setOnClickListener(this);
@@ -782,17 +817,9 @@ public class MainActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView,
                                          boolean isChecked) {
                 if (isChecked) {
-//                    if(!scan_start){
-//                        scan_start = true;
-//                        startScan();
-//                    }
-                    /*scancount = 0;
-                    handler.removeCallbacks(startTask);
-                    handler.postDelayed(startTask, 0);*/
-                    ////////////////////////
-//                    barcode_scanner.setResultHandler(MainActivity.this);
-//                    barcode_scanner.startCamera();
-//                    barcode_scanner.setVisibility(View.VISIBLE);
+                    button_single.setEnabled(false);
+                    background_image.setBackground(getResources().getDrawable(R.drawable.background_image_on));
+                    multi_scan = true;
                     if(cameraProviderFuture != null){
                         cameraProviderFuture = null;
                     }
@@ -820,15 +847,54 @@ public class MainActivity extends AppCompatActivity {
                     }, ContextCompat.getMainExecutor(mcontext));
                     ////////////////////////
                 } else {
-//                    scan_start = false;
-//                    handler.removeCallbacks(startTask);
-//                    scanDecode.stopScan();
-
-
+                    button_single.setEnabled(true);
+                    background_image.setBackground(getResources().getDrawable(R.drawable.background_image));
+                    multi_scan = false;
+                    processCameraProvider.unbindAll();
+                    previewView.setVisibility(View.GONE);
                     ////////////////////////
-//                    barcode_scanner.stopCamera();
-//                    barcode_scanner.setVisibility(View.INVISIBLE);
-
+                }
+            }
+        });
+        button_single.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView,
+                                         boolean isChecked) {
+                if (isChecked) {
+                    toggleButtonRepeat.setEnabled(false);
+                    background_image.setBackground(getResources().getDrawable(R.drawable.background_image_on));
+                    single_scan = true;
+                    touch_on = true;
+                    if(cameraProviderFuture != null){
+                        cameraProviderFuture = null;
+                    }
+                    if(previewView.getVisibility() == View.GONE)
+                    {
+                        previewView.setVisibility(View.VISIBLE);
+                    }
+                    cameraProviderFuture = ProcessCameraProvider.getInstance(mcontext);
+                    cameraProviderFuture.addListener(new Runnable() {
+                        @Override
+                        public void run() {
+                            try{
+                                if(ActivityCompat.checkSelfPermission(mcontext, Manifest.permission.CAMERA) != (PackageManager.PERMISSION_GRANTED)){
+                                    ActivityCompat.requestPermissions(mactivity,new String[] {Manifest.permission.CAMERA},101);
+                                }else{
+                                    processCameraProvider = (ProcessCameraProvider) cameraProviderFuture.get();
+                                    bindpreview(processCameraProvider);
+                                }
+                            }catch (ExecutionException e){
+                                e.printStackTrace();
+                            }catch (InterruptedException e){
+                                e.printStackTrace();
+                            }
+                        }
+                    }, ContextCompat.getMainExecutor(mcontext));
+                    ////////////////////////
+                } else {
+                    toggleButtonRepeat.setEnabled(true);
+                    background_image.setBackground(getResources().getDrawable(R.drawable.background_image));
+                    single_scan = false;
                     processCameraProvider.unbindAll();
                     previewView.setVisibility(View.GONE);
                     ////////////////////////

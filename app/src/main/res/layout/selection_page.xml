@@ -5,13 +5,13 @@
     android:layout_height="match_parent">
 
     <Button
-        android:layout_marginTop="200dp"
-        android:layout_centerHorizontal="true"
-        android:text="해외 출고"
-        android:textSize="30sp"
         android:id="@+id/Btn_eai_data"
         android:layout_width="200dp"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="200dp"
+        android:text="해외 출고"
+        android:textSize="30sp" />
     <Button
         android:layout_marginTop="300dp"
         android:layout_centerHorizontal="true"

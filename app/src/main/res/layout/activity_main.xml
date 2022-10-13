@@ -30,7 +30,7 @@
                 android:layout_height="match_parent">
 
                 <ImageView
-                    android:id="@+id/image"
+                    android:id="@+id/background_image"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_centerInParent="true"
@@ -324,6 +324,16 @@
             android:layout_weight="1"
             android:textOff="@string/but_repeat"
             android:textOn="@string/but_stop" />
+
+        <ToggleButton
+            android:checked="false"
+            android:id="@+id/button_single"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="fill"
+            android:layout_weight="1"
+            android:textOff="수동\n시작"
+            android:textOn="수동\n중지" />
 
         <Button
             android:visibility="gone"

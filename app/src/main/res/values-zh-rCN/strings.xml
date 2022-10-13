@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">NPC Scanner</string>
+    <string name="app_name">NPC 포장 scanner</string>
     <string name="barcode_name">条码扫描</string>
     <string name="but_start">单次扫描</string>
     <string name="but_repeat">重复扫描</string>

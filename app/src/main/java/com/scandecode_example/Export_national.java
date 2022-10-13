@@ -183,7 +183,9 @@ public class Export_national extends AppCompatActivity {
                     .addOnSuccessListener(new OnSuccessListener<List<Barcode>>() {
                         @Override
                         public void onSuccess(List<Barcode> barcodes) {
+
                             readerBarcodeData(barcodes);
+
                             // Task completed successfully
                             // ...
                         }
