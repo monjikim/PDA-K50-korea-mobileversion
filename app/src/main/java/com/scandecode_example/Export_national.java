@@ -12,10 +12,13 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.media.AudioManager;
 import android.media.Image;
+import android.media.ToneGenerator;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Vibrator;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -36,12 +39,15 @@ import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.camera.core.Camera;
+import androidx.camera.core.CameraControl;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageCapture;
@@ -136,6 +142,9 @@ public class Export_national extends AppCompatActivity {
     ProcessCameraProvider processCameraProvider;
     ArrayList arrayList = new ArrayList();
 
+    Vibrator vib;
+    ToneGenerator tg;
+    Switch flash_light;
 
 //    ZXingScannerView barcode_scanner;
 
@@ -241,6 +250,8 @@ public class Export_national extends AppCompatActivity {
                                         arr.add(data);
                                         mReception.append(""+data+"\n");
                                         scancount+=1;
+                                        vib.vibrate(1000);
+                                        tg.startTone(ToneGenerator.TONE_PROP_BEEP);
                                         tv_count.setText(""+(scancount));
                                     }
 //                                    scancount+=1;
@@ -267,9 +278,12 @@ public class Export_national extends AppCompatActivity {
         setContentView(R.layout.scan_export_national);
         mainScreen();
 
+        flash_light = findViewById(R.id.switchFlashLight);
         mcontext = this;
         mactivity = this;
 
+        vib = (Vibrator)getSystemService(VIBRATOR_SERVICE);
+        tg = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
         previewView = findViewById(R.id.previewview);
         this.getWindow().setFlags(1024,1024);
 
@@ -391,10 +405,13 @@ public class Export_national extends AppCompatActivity {
                     Toast.makeText(mContext, "작업 이후에 선택해주세요.", Toast.LENGTH_SHORT).show();
                 }
                 else{
+                    int delete_length = 0;
+                    delete_length = 0;
+                    delete_length += (arr.get(arr.size()-1).toString().length())+1;
                     arrayList.remove(arrayList.size()-1);
                     arr.remove(arr.size()-1);
                     Toast.makeText(mContext, "마지막 작업이 삭제 되었습니다.", Toast.LENGTH_SHORT).show();
-                    mReception.setText(mReception.getText().subSequence(0,(mReception.length()-14)));
+                    mReception.setText(mReception.getText().subSequence(0,(mReception.length()-delete_length)));
                     scancount-=1;
                     tv_count.setText(scancount+"");
                 }
@@ -522,6 +539,8 @@ public class Export_national extends AppCompatActivity {
                         if (!serial_check) {
                             arr.add(add_serial);
                             scancount+=1;
+                            vib.vibrate(1000);
+                            tg.startTone(ToneGenerator.TONE_PROP_BEEP);
                             mReception.append(""+add_serial+"\n");
 //                        mReception.append("" + arr.get(textadding).toString() + "   >>   [ ");
 //                        mReception.append(String.format("%3d", textadding + 1));
@@ -609,7 +628,29 @@ public class Export_national extends AppCompatActivity {
 //            processCameraProvider.bindToLifecycle(/* lifecycleOwner= */ this, cameraSelector, analysisUseCase);
 //        }
         processCameraProvider1.unbindAll();
-        processCameraProvider1.bindToLifecycle(this,cameraSelector,preview,imageCapture,imageAnalysis);
+
+        Camera camera = processCameraProvider1.bindToLifecycle(this, cameraSelector, preview, imageCapture, imageAnalysis);
+        CameraControl cameracontroler = camera.getCameraControl();
+        if(flash_light.isChecked()){
+            cameracontroler.enableTorch(true);
+        }
+        else{
+            cameracontroler.enableTorch(false);
+        }
+        flash_light.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                if(isChecked){
+                    cameracontroler.enableTorch(true);
+                    flash_light.setText("플래쉬 ON");
+                }
+                else {
+                    cameracontroler.enableTorch(false);
+                    flash_light.setText("플래쉬 OFF");
+                }
+            }
+        });
+//        processCameraProvider1.bindToLifecycle(this,cameraSelector,preview,imageCapture,imageAnalysis);
     }
 
     @Override

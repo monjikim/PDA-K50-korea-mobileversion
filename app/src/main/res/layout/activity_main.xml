@@ -29,6 +29,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
+                <Switch
+                    android:id="@+id/switchFlashLight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:checked="true"
+                    android:text="플래쉬 ON" />
                 <ImageView
                     android:id="@+id/background_image"
                     android:layout_width="match_parent"
@@ -196,7 +203,7 @@
                 android:gravity="center_vertical"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp" />
-            <TextView
+            <EditText
                 android:id="@+id/tv_order_no"
                 android:textSize="18sp"
                 android:gravity="center"
@@ -226,7 +233,7 @@
                 android:gravity="center_vertical"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp" />
-            <TextView
+            <EditText
                 android:id="@+id/tv_case_no"
                 android:textSize="18sp"
                 android:gravity="center"

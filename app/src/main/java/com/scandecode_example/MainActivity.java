@@ -13,10 +13,15 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraManager;
+import android.media.AudioManager;
 import android.media.Image;
 import android.media.ToneGenerator;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Vibrator;
 import android.provider.Settings;
 import android.text.Editable;
 import android.text.InputType;
@@ -30,13 +35,18 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.camera.core.Camera;
+import androidx.camera.core.CameraControl;
+import androidx.camera.core.CameraInfoUnavailableException;
 import androidx.camera.core.CameraSelector;
+import androidx.camera.core.CameraX;
 import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageProxy;
@@ -46,6 +56,7 @@ import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.LiveData;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -89,7 +100,8 @@ public class MainActivity extends AppCompatActivity {
 //    private ScanInterface scanDecode;
     boolean order_no_flag = false;
     boolean serial_no_flag = false;
-    TextView tv_order_no,tv_case_no,tv_date,tv_serial_no,tv_count;
+    TextView tv_date,tv_serial_no,tv_count;
+    EditText tv_order_no,tv_case_no;
     ArrayList order_array;
     ArrayList serial_array;
     Button button_undo,button_send;
@@ -120,10 +132,9 @@ public class MainActivity extends AppCompatActivity {
     boolean single_scan = false;
     boolean multi_scan = false;
     ImageView background_image;
-
-
-//    ZXingScannerView barcode_scanner;
-
+    Vibrator vib;
+    ToneGenerator tg;
+    Switch flash_light;
 
     public class MyImageAnalyzer implements ImageAnalysis.Analyzer{
         private FragmentManager fragmentManager;
@@ -238,6 +249,8 @@ public class MainActivity extends AppCompatActivity {
                                             if(scancount == 0){
                                                 arrayList.add(data);
                                                 scancount+=1;
+                                                vib.vibrate(1000);
+                                                tg.startTone(ToneGenerator.TONE_PROP_BEEP);
                                                 tv_count.setText(scancount+"");
                                                 serial_no_flag = false;
                                                 tv_order_no.setText(data.trim().substring(0,10));
@@ -246,13 +259,14 @@ public class MainActivity extends AppCompatActivity {
                                                 order_array.add(tv_order_no.getText().toString().trim()+tv_case_no.getText().toString().trim());
                                                 serial_array.add(tv_serial_no.getText().toString().trim());
 
-                                                mReception.append(scancount+" "+tv_order_no.getText()+" "+tv_case_no.getText()+"\n"+tv_serial_no.getText()+"\n");
+                                                mReception.append(scancount+" "+tv_order_no.getText()+" "+tv_case_no.getText()+" "+tv_serial_no.getText()+"\n");
 
                                                 tv_order_no.setText("");
                                                 tv_case_no.setText("");
                                                 tv_serial_no.setText("");
                                                 Log.d("sw","LOGGGGGGGGGGGGGGGGGGGGGG/////"+order_array.toString()+"/////////"+serial_array.toString());
-                                            }else{
+                                            }
+                                            else{
                                                 for(int i=0; i<order_array.size();i++){
                                                     if(order_array.get(i).equals(data.trim())){
                                                         order_check = true;
@@ -264,6 +278,8 @@ public class MainActivity extends AppCompatActivity {
                                                 }else{
                                                     arrayList.add(data);
                                                     scancount+=1;
+                                                    vib.vibrate(1000);
+                                                    tg.startTone(ToneGenerator.TONE_PROP_BEEP);
                                                     tv_count.setText(scancount+"");
                                                     serial_no_flag = false;
                                                     tv_order_no.setText(data.trim().substring(0,10));
@@ -271,7 +287,7 @@ public class MainActivity extends AppCompatActivity {
 
                                                     order_array.add(tv_order_no.getText().toString().trim()+tv_case_no.getText().toString().trim());
                                                     serial_array.add(tv_serial_no.getText().toString().trim());
-                                                    mReception.append(scancount+" "+tv_order_no.getText()+" "+tv_case_no.getText()+"\n"+tv_serial_no.getText()+"\n");
+                                                    mReception.append(scancount+" "+tv_order_no.getText()+" "+tv_case_no.getText()+" "+tv_serial_no.getText()+"\n");
 
                                                     tv_order_no.setText("");
                                                     tv_case_no.setText("");
@@ -286,6 +302,8 @@ public class MainActivity extends AppCompatActivity {
                                             if(scancount == 0){
                                                 arrayList.add(data);
                                                 scancount+=1;
+                                                vib.vibrate(1000);
+                                                tg.startTone(ToneGenerator.TONE_PROP_BEEP);
                                                 tv_count.setText(scancount+"");
                                                 order_no_flag = false;
                                                 tv_serial_no.setText(data.trim());
@@ -311,6 +329,8 @@ public class MainActivity extends AppCompatActivity {
                                                 }else{
                                                     arrayList.add(data);
                                                     scancount+=1;
+                                                    vib.vibrate(1000);
+                                                    tg.startTone(ToneGenerator.TONE_PROP_BEEP);
                                                     tv_count.setText(scancount+"");
                                                     order_no_flag = false;
                                                     tv_serial_no.setText(data.trim());
@@ -335,6 +355,8 @@ public class MainActivity extends AppCompatActivity {
                                         if(data.substring(0,3).equals("CP-")){
                                             if(scancount == 0){
                                                 arrayList.add(data);
+                                                vib.vibrate(1000);
+                                                tg.startTone(ToneGenerator.TONE_PROP_BEEP);
                                                 serial_no_flag = true;
                                                 tv_serial_no.setText(data.trim());
                                             }else{
@@ -348,6 +370,8 @@ public class MainActivity extends AppCompatActivity {
                                                     Toast.makeText(MainActivity.this, "이미 등록된 시리얼 번호 입니다.", Toast.LENGTH_SHORT).show();
                                                 }else{
                                                     arrayList.add(data);
+                                                    vib.vibrate(1000);
+                                                    tg.startTone(ToneGenerator.TONE_PROP_BEEP);
                                                     serial_no_flag = true;
                                                     tv_serial_no.setText(data.trim());
                                                 }
@@ -356,6 +380,8 @@ public class MainActivity extends AppCompatActivity {
                                         else{
                                             if(scancount == 0){
                                                 arrayList.add(data);
+                                                vib.vibrate(1000);
+                                                tg.startTone(ToneGenerator.TONE_PROP_BEEP);
                                                 order_no_flag= true;
                                                 tv_order_no.setText(data.trim().substring(0,10));
                                                 tv_case_no.setText(data.substring(10,data.trim().length()));
@@ -370,6 +396,8 @@ public class MainActivity extends AppCompatActivity {
                                                     Toast.makeText(MainActivity.this, "이미 등록된 오더 번호 입니다.", Toast.LENGTH_SHORT).show();
                                                 }else{
                                                     arrayList.add(data);
+                                                    vib.vibrate(1000);
+                                                    tg.startTone(ToneGenerator.TONE_PROP_BEEP);
                                                     order_no_flag= true;
                                                     tv_order_no.setText(data.trim().substring(0,10));
                                                     tv_case_no.setText(data.substring(10,data.trim().length()));
@@ -404,13 +432,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        flash_light = findViewById(R.id.switchFlashLight);
 //        scanDecode = new ScanDecode(this);
 //        scanDecode.initService("true");//初始化扫描服务
         //btnSingleScan = (Button) findViewById(R.id.buttonscan);
 
-
         mcontext = this;
         mactivity = this;
+        vib = (Vibrator)getSystemService(VIBRATOR_SERVICE);
+        tg = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
         background_image = findViewById(R.id.background_image);
         previewView = findViewById(R.id.previewview);
         previewView.setOnClickListener(new View.OnClickListener() {
@@ -489,8 +519,8 @@ public class MainActivity extends AppCompatActivity {
         //toggleButtonSound =(ToggleButton) findViewById(R.id.butSound);
         //toggleButtonVibrate = (ToggleButton) findViewById(R.id.butVibrate);
 
-        tv_order_no = (TextView)findViewById(R.id.tv_order_no);
-        tv_case_no = (TextView)findViewById(R.id.tv_case_no);
+        tv_order_no = (EditText) findViewById(R.id.tv_order_no);
+        tv_case_no = (EditText) findViewById(R.id.tv_case_no);
         tv_date = (TextView)findViewById(R.id.tv_date);
         tv_serial_no = (TextView)findViewById(R.id.tv_serial_no);
 
@@ -522,10 +552,13 @@ public class MainActivity extends AppCompatActivity {
         container_no.addTextChangedListener(new TextWatcher() {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                container_no.removeTextChangedListener(this);
+                container_no.setText(s.toString().toUpperCase());
                 if(s.toString().equals(" ")){
                     container_no.setText(container_no.getText().subSequence(0,container_no.getText().length()-1));
                     container_no.setSelection(container_no.getText().length());
-                }else if(s.toString().length()>0){
+                }
+                else if(s.toString().length()>0){
                     if(s.toString().substring(s.toString().length()-1).equals(" ")){
                         container_no.setText(container_no.getText().subSequence(0,container_no.getText().length()-1));
                         container_no.setSelection(container_no.getText().length());
@@ -535,7 +568,7 @@ public class MainActivity extends AppCompatActivity {
                     container_no.setInputType(InputType.TYPE_CLASS_TEXT);
                     container_no.setSelection(container_no.getText().length());
                 }
-                if(s.length() == 4){
+                if(s.length() >= 4){
                     container_no.setInputType(InputType.TYPE_CLASS_NUMBER);
                     container_no.setSelection(container_no.getText().length());
                 }
@@ -615,10 +648,12 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(MainActivity.this, "잘못된 컨테이너 번호입니다.", Toast.LENGTH_SHORT).show();
                     }
                 }
+                container_no.addTextChangedListener(this);
             }
             @Override
             public void afterTextChanged(Editable arg0) {
                 // 입력이 끝났을 때
+//                container_no.setText(container_no.getText().toString().toUpperCase());
             }
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -636,17 +671,23 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if(order_array.size() <= 0){
                     Toast.makeText(MainActivity.this, "작업 이후에 선택해주세요.", Toast.LENGTH_SHORT).show();
-                }else{
+                }
+                else{
+                    int delete_length = 0;
+                    delete_length = 0;
                     if(order_no_flag){
                         arrayList.remove(arrayList.size()-2);
                         arrayList.remove(arrayList.size()-2);
-                    }else if(serial_no_flag){
+                    }
+                    else if(serial_no_flag){
                         arrayList.remove(arrayList.size()-2);
                         arrayList.remove(arrayList.size()-2);
-                    }else{
+                    }
+                    else{
                         arrayList.remove(arrayList.size()-1);
                         arrayList.remove(arrayList.size()-1);
                     }
+                    delete_length += (order_array.get(order_array.size()-1).toString().length())+(serial_array.get(serial_array.size()-1).toString().length())+4;
                     order_array.remove(order_array.size()-1);
                     serial_array.remove(serial_array.size()-1);
                     tv_order_no.setText("");
@@ -655,7 +696,7 @@ public class MainActivity extends AppCompatActivity {
                     order_no_flag = false;
                     serial_no_flag= false;
                     Toast.makeText(MainActivity.this, "마지막 작업이 삭제 되었습니다.", Toast.LENGTH_SHORT).show();
-                    mReception.setText(mReception.getText().subSequence(0,(mReception.length()-30)-(scancount+"").length()));
+                    mReception.setText(mReception.getText().subSequence(0,(mReception.length()-delete_length)-(scancount+"").length()));
                     scancount-=1;
                     tv_count.setText(scancount+"");
                 }
@@ -1228,7 +1269,28 @@ public class MainActivity extends AppCompatActivity {
 //            processCameraProvider.bindToLifecycle(/* lifecycleOwner= */ this, cameraSelector, analysisUseCase);
 //        }
         processCameraProvider1.unbindAll();
-        processCameraProvider1.bindToLifecycle(this,cameraSelector,preview,imageCapture,imageAnalysis);
+        Camera camera = processCameraProvider1.bindToLifecycle(this, cameraSelector, preview, imageCapture, imageAnalysis);
+        CameraControl cameracontroler = camera.getCameraControl();
+        if(flash_light.isChecked()){
+            cameracontroler.enableTorch(true);
+        }
+        else{
+            cameracontroler.enableTorch(false);
+        }
+        flash_light.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                if(isChecked){
+                    cameracontroler.enableTorch(true);
+                    flash_light.setText("플래쉬 ON");
+                }
+                else {
+                    cameracontroler.enableTorch(false);
+                    flash_light.setText("플래쉬 OFF");
+                }
+            }
+        });
+
     }
 
     //Receiving broadcast
