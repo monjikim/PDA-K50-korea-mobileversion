@@ -6,9 +6,11 @@
         <entry key="..\:/swchung/IoT/git_control/PDA-K50-koreapackage/app/src/main/res/drawable/background_image.xml" value="0.367" />
         <entry key="..\:/swchung/IoT/git_control/PDA-K50-koreapackage/app/src/main/res/drawable/background_image_on.xml" value="0.367" />
         <entry key="..\:/swchung/IoT/git_control/PDA-K50-koreapackage/app/src/main/res/drawable/ic_baseline_close_24.xml" value="0.228" />
-        <entry key="..\:/swchung/IoT/git_control/PDA-K50-koreapackage/app/src/main/res/layout/activity_main.xml" value="0.24409722222222222" />
+        <entry key="..\:/swchung/IoT/git_control/PDA-K50-koreapackage/app/src/main/res/layout/activity_main.xml" value="0.3004273504273504" />
         <entry key="..\:/swchung/IoT/git_control/PDA-K50-koreapackage/app/src/main/res/layout/bottom_dialog.xml" value="0.24409722222222222" />
         <entry key="..\:/swchung/IoT/git_control/PDA-K50-koreapackage/app/src/main/res/layout/log_in.xml" value="0.24409722222222222" />
+        <entry key="..\:/swchung/IoT/git_control/PDA-K50-koreapackage/app/src/main/res/layout/manual_pop_up.xml" value="0.24409722222222222" />
+        <entry key="..\:/swchung/IoT/git_control/PDA-K50-koreapackage/app/src/main/res/layout/order_manual_pop_up.xml" value="0.24409722222222222" />
         <entry key="..\:/swchung/IoT/git_control/PDA-K50-koreapackage/app/src/main/res/layout/scan_export_national.xml" value="0.24409722222222222" />
         <entry key="..\:/swchung/IoT/git_control/PDA-K50-koreapackage/app/src/main/res/layout/selection_page.xml" value="0.24409722222222222" />
       </map>
